@@ -1,0 +1,1 @@
+find \( -path '*#*#*' -o -path '*~' \) -type f -print -delete
