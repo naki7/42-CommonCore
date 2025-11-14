@@ -1,16 +1,16 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   get_next_line.c                                    :+:      :+:    :+:   */
+/*   get_next_line_bonus.c                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: joshde-s <joshde-s@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/04 18:13:32 by joshde-s          #+#    #+#             */
-/*   Updated: 2025/11/10 15:04:52 by joshde-s         ###   ########.fr       */
+/*   Updated: 2025/11/10 19:18:13 by joshde-s         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "get_next_line.h"
+#include "get_next_line_bonus.h"
 
 char	*get_init_line(int fd, char *line)
 {
@@ -92,20 +92,20 @@ char	*setup_next_call(char *line)
 
 char	*get_next_line(int fd)
 {
-	static char	*line;
+	static char	*lines[4200];
 	char		*current;
 
 	if (fd < 0 || BUFFER_SIZE <= 0)
 		return (0);
-	line = get_init_line(fd, line);
-	if (!line)
+	lines[fd] = get_init_line(fd, lines[fd]);
+	if (!lines[fd])
 	{
-		free(line);
-		line = NULL;
+		free(lines[fd]);
+		lines[fd] = NULL;
 		return (NULL);
 	}
-	current = get_current(line);
-	line = setup_next_call(line);
+	current = get_current(lines[fd]);
+	lines[fd] = setup_next_call(lines[fd]);
 	return (current);
 }
 
@@ -116,19 +116,43 @@ char	*get_next_line(int fd)
 //{
 //	char	*printline;
 //	int		agatha;
+//	int		billy;
+//	int		scene;
 //	int		i;
 //
-//	printf("[open one-sided scene]\n");
+//	printf("[open scene]\n");
 //	agatha = open("scripts/Agatha.txt", O_RDONLY);
+//	billy = open("scripts/Billy.txt", O_RDONLY);
+//	scene = open("scripts/Scene.txt", O_RDONLY);
 //	i = 0;
 //	while (i < 11)
 //	{
-//		printline = get_next_line(agatha);
+//		printline = get_next_bonus(billy);
+//		printf("Billy: %s", printline);
+//		free(printline);
+//		printline = get_next_bonus(agatha);
 //		printf("Agatha: %s", printline);
 //		free(printline);
+//		if (i == 8)
+//		{
+//			printline = get_next_bonus(scene);
+//			printf(" - - - %s", printline);
+//			free(printline);
+//			printline = get_next_bonus(scene);
+//			printf(" - - - %s", printline);
+//			free(printline);
+//		}
+//		if (i == 10)
+//		{
+//			printline = get_next_bonus(scene);
+//			printf(" - - - %s", printline);
+//			free(printline);
+//		}
 //		i++;
 //	}
 //	close(agatha);
-//	printf("[end one-sided scene]");
+//	close(billy);
+//	close(scene);
+//	printf("[end scene]");
 //	return (0);
 //}
