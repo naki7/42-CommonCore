@@ -33,7 +33,7 @@ void	fill_dynamic_array(int *norm, int **dyn_arr, int indx)
 	}
 }
 
-int	get_lis(int *norm, int size, int start, int *temp)
+int	get_lis(int *norm, int size, int *temp)
 {
 	int	*dyn_arr[2];
 	int	maxlen;
@@ -66,7 +66,7 @@ int	get_lis(int *norm, int size, int start, int *temp)
 	maxindx = maxlen - 1;
 	while (i != -1)
 	{
-		temp[maxindx--] = start + i;
+		temp[maxindx--] = i;
 		i = dyn_arr[1][i];
 	}
 	return (maxlen);
@@ -84,7 +84,7 @@ int	build_keep(int *norm, int size, int *keep)
 	best_len = 0;
 	while (i < size)
 	{
-		temp_len = get_lis(norm, size, i, temp_arr);
+		temp_len = get_lis(norm, size, temp_arr);
 		if (best_len < temp_len)
 		{
 			best_len = temp_len;
@@ -121,11 +121,13 @@ void	large_sort(int *norm, int *alen, int *stackb, int *blen)
 {
 	int	keep[*alen];
 	int	keep_len;
+	int	total;
 	int	i;
 
 	i = 0;
+	total = *alen;
 	keep_len = build_keep(norm, *alen, keep);
-	while (keep_len < *alen)
+	while (i < total)
 	{
 		if (keep[i] == 0)
 			pushtob(stackb, blen, norm, alen);
@@ -133,6 +135,12 @@ void	large_sort(int *norm, int *alen, int *stackb, int *blen)
 			rotate_a(norm, *alen);
 		i++;
 	}
+	i = 0;
+	while (i < *alen)
+		printf("\nstacka: %i\n", norm[i++]);
+	i = 0;
+	while (i < *blen)
+		printf("\nstackb: %i\n", stackb[i++]);
 	greedy(norm, alen, stackb, blen);
 	i = 0;
 	while (i < *alen)

@@ -60,7 +60,7 @@ int	get_best_indx(int *norm, int alen, int b_val)
 	small_indx = 0;
 	big_indx = 0;
 	while (i < alen)
-	{//might need to change index finding logic
+	{
 		if (norm[i] < curr_small)
 		{
 			curr_small = norm[i];
@@ -78,10 +78,8 @@ int	get_best_indx(int *norm, int alen, int b_val)
 	i = 0;
 	while (i < alen - 1)
 	{
-		curr_small = norm[i - 1];
-		curr_big = norm[i];
-		if (curr_small < b_val && b_val < curr_big)
-			return (i);
+		if (norm[i] < b_val && b_val < norm[i + 1])
+			return (i + 1);
 		i++;
 	}
 	return (0);
