@@ -13,7 +13,7 @@
 #include "libpushswap.h"
 #include <stdio.h>
 
-void	fill_dynamic_array(int *norm, int **dyn_arr, int *details, int indx)
+void	fill_dynamic_array(int *norm, int **dyn_arr, int indx)
 {
 	int	curr_v;
 	int	prev_v;
@@ -22,8 +22,8 @@ void	fill_dynamic_array(int *norm, int **dyn_arr, int *details, int indx)
 	j = 0;
 	while (j < indx)
 	{
-		curr_v = norm[(details[0] + indx) % details[1]];
-		prev_v = norm[(details[0] + j) % details[1]];
+		curr_v = norm[indx];
+		prev_v = norm[j];
 		if (prev_v < curr_v && dyn_arr[0][j] + 1 > dyn_arr[0][indx])
 		{
 			dyn_arr[0][indx] = dyn_arr[0][j] + 1;
@@ -36,7 +36,6 @@ void	fill_dynamic_array(int *norm, int **dyn_arr, int *details, int indx)
 int	get_lis(int *norm, int size, int start, int *temp)
 {
 	int	*dyn_arr[2];
-	int	details[2];
 	int	maxlen;
 	int	maxindx;
 	int	i;
@@ -44,9 +43,9 @@ int	get_lis(int *norm, int size, int start, int *temp)
 	i = 0;
 	dyn_arr[0] = malloc(size * sizeof(int));
 	dyn_arr[1] = malloc(size * sizeof(int));
-	details[0] = start;
-	details[1] = size;
-	while (i < details[1])
+	maxlen = 0;
+	maxindx = 0;
+	while (i < size)
 	{
 		dyn_arr[0][i] = 1;
 		dyn_arr[1][i] = -1;
@@ -55,7 +54,7 @@ int	get_lis(int *norm, int size, int start, int *temp)
 	i = 0;
 	while (i < size)
 	{
-		fill_dynamic_array(norm, dyn_arr, details, i);
+		fill_dynamic_array(norm, dyn_arr, i);
 		if(dyn_arr[0][i] > maxlen)
 		{
 			maxlen = dyn_arr[0][i];
@@ -67,7 +66,7 @@ int	get_lis(int *norm, int size, int start, int *temp)
 	maxindx = maxlen - 1;
 	while (i != -1)
 	{
-		temp[maxindx--] = (start + i) % size;
+		temp[maxindx--] = start + i;
 		i = dyn_arr[1][i];
 	}
 	return (maxlen);

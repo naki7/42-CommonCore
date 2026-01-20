@@ -17,9 +17,13 @@ int	cost_to_rotate(int a_indx, int b_indx, int *sizes, int *costs)
 {
 	if (a_indx > (sizes[0] / 2))
 		costs[0] = a_indx - sizes[0];
+	else
+		costs[0] = a_indx;
 	if (b_indx > (sizes[1] / 2))
 		costs[1] = b_indx - sizes[1];
-	if (costs[0] >= 0 && costs[1] >= 0)
+	else
+		costs[1] = b_indx;
+	if (costs[0] > 0 && costs[1] > 0)
 	{
 		if (costs[0] >= costs[1])
 			return (costs[0]);
@@ -27,11 +31,11 @@ int	cost_to_rotate(int a_indx, int b_indx, int *sizes, int *costs)
 	}
 	else if (costs[0] < 0 && costs[1] < 0)
 	{
-		if (costs[0] < costs[1])
+		if (costs[0] <= costs[1])
 			return (costs[0] * -1);
 		return (costs[1] * -1);
 	}
-	else if (costs[0] > costs[1])
+	else if (costs[0] >= costs[1])
 	{
 		if (costs[0] > 0)
 			return (costs[0]);
@@ -53,6 +57,8 @@ int	get_best_indx(int *norm, int alen, int b_val)
 	i = 0;
 	curr_small = norm[0];
 	curr_big = norm[0];
+	small_indx = 0;
+	big_indx = 0;
 	while (i < alen)
 	{//might need to change index finding logic
 		if (norm[i] < curr_small)
@@ -60,7 +66,7 @@ int	get_best_indx(int *norm, int alen, int b_val)
 			curr_small = norm[i];
 			small_indx = i;
 		}
-		else if (norm[i] > curr_big)
+		if (norm[i] > curr_big)
 		{
 			curr_big = norm[i];
 			big_indx = i;
@@ -69,16 +75,16 @@ int	get_best_indx(int *norm, int alen, int b_val)
 	}
 	if (b_val < curr_small || b_val > curr_big)
 		return ((big_indx + 1) % alen);
-	i = 1;
-	while (i < alen)
+	i = 0;
+	while (i < alen - 1)
 	{
 		curr_small = norm[i - 1];
 		curr_big = norm[i];
 		if (curr_small < b_val && b_val < curr_big)
-			return i;
+			return (i);
 		i++;
 	}
-	return (small_indx + 1);
+	return (0);
 }
 
 void	get_cheapest_move(int *norm, int *stackb, int *sizes, int *best_costs)
