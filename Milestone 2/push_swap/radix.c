@@ -130,18 +130,19 @@ void	handle_stack(int *stacka, int *alen, int *stackb, int *blen)
 	i = 0;
 	normstack = malloc((*alen) * sizeof(int));
 	normalize(stacka, *alen, normstack);
-	if (*alen < 5)
+	while (i < ((*alen) - 1))
 	{
-		while (i < ((*alen) - 1))
-		{
-			if (normstack[i] < normstack[i + 1])
-				i++;
-			else
-			{
-				radix(normstack, alen, stackb, blen);
-				break ;
-			}
-		}
+		if (normstack[i] == i)
+			i++;
+		else
+			break ;
+		if (i == ((*alen) - 1))
+			return ;
+	}
+	if (*alen < 6)
+	{
+		radix(normstack, alen, stackb, blen);
+		return ;
 	}
 	else
 		large_sort(normstack, alen, stackb, blen);

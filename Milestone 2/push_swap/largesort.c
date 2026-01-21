@@ -6,7 +6,7 @@
 /*   By: joshde-s <joshde-s@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/12 16:37:27 by joshde-s          #+#    #+#             */
-/*   Updated: 2026/01/15 13:04:57 by joshde-s         ###   ########.fr       */
+/*   Updated: 2026/01/21 14:35:11 by joshde-s         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,6 +33,23 @@ void	fill_dynamic_array(int *norm, int **dyn_arr, int indx)
 	}
 }
 
+void	init_dynamic_array(int **dyn_arr, int *len, int *indx, int size)
+{
+	int	i;
+
+	dyn_arr[0] = malloc(size * sizeof(int));
+	dyn_arr[1] = malloc(size * sizeof(int));
+	*len = 0;
+	*indx = 0;
+	i = 0;
+	while (i < size)
+	{
+		dyn_arr[0][i] = 1;
+		dyn_arr[1][i] = -1;
+		i++;
+	}
+}
+
 int	get_lis(int *norm, int size, int *temp)
 {
 	int	*dyn_arr[2];
@@ -41,17 +58,7 @@ int	get_lis(int *norm, int size, int *temp)
 	int	i;
 
 	i = 0;
-	dyn_arr[0] = malloc(size * sizeof(int));
-	dyn_arr[1] = malloc(size * sizeof(int));
-	maxlen = 0;
-	maxindx = 0;
-	while (i < size)
-	{
-		dyn_arr[0][i] = 1;
-		dyn_arr[1][i] = -1;
-		i++;
-	}
-	i = 0;
+	init_dynamic_array(dyn_arr, &maxlen, &maxindx, size);
 	while (i < size)
 	{
 		fill_dynamic_array(norm, dyn_arr, i);
@@ -82,7 +89,7 @@ int	build_keep(int *norm, int size, int *keep)
 
 	i = 0;
 	best_len = 0;
-	while (i < size)
+	while (i < size)//create as own func, removes 14ish lines
 	{
 		temp_len = get_lis(norm, size, temp_arr);
 		if (best_len < temp_len)
@@ -108,12 +115,6 @@ int	build_keep(int *norm, int size, int *keep)
 		keep[best_arr[i]] = 1;
 		i++;
 	}
-	i = 0;
-	while (i < size)
-	{
-		printf("\nkeep i: %i, - v: %i\n", i, keep[i]);
-		i++;
-	}
 	return (best_len);
 }
 
@@ -135,17 +136,5 @@ void	large_sort(int *norm, int *alen, int *stackb, int *blen)
 			rotate_a(norm, *alen);
 		i++;
 	}
-	i = 0;
-	while (i < *alen)
-		printf("\nstacka: %i\n", norm[i++]);
-	i = 0;
-	while (i < *blen)
-		printf("\nstackb: %i\n", stackb[i++]);
 	greedy(norm, alen, stackb, blen);
-	i = 0;
-	while (i < *alen)
-		printf("\nstacka: %i\n", norm[i++]);
-	i = 0;
-	while (i < *blen)
-		printf("\nstackb: %i\n", stackb[i++]);
 }
