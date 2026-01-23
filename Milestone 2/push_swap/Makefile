@@ -10,33 +10,48 @@
 #                                                                              #
 # **************************************************************************** #
 
-NAME = push_swap 
+NAME = push_swap
 
 CC = cc
 CFLAGS = -Wall -Wextra -Werror
 COMPILE = $(CC) $(CFLAGS)
-AR = ar rcs
 
-CFILES = 
+CFILES = push_swap.c stack_funcs.c ft_atoi.c ft_split.c ft_strchr.c ft_strlcpy.c ft_strlen.c swap.c push.c rotate.c reverse.c radix.c largesort.c greedy.c large_utils.c radix_utils.c
 OBJS = $(CFILES:.c=.o)
-#BFILES = 
-#BOBJS = $(BFILES:.c=.o)
 
 RM = rm -f
 
-#ifdef BONUS
-#	ALLOBJS = $(OBJS) $(BOBJS)
-#else
-#	ALLOBJS = $(OBJS)
-#endif
-
 all: $(NAME)
 
-$(NAME): $(ALLOBJS)
-	$(COMPILE) $(ALLOBJS) -o $(NAME)
+$(NAME): $(OBJS)
+	$(COMPILE) $(OBJS) -o $(NAME)
 
-#bonus:
-#	$(MAKE) BONUS=1
+HUND_MIN := 1
+HUND_MAX := 100
+
+FIVE_MAX:= 500
+
+test_both: test_hundred test_five
+
+test_hundred: num_hundred check_hundred
+
+num_hundred:
+	ARGS=$$(shuf -i "$(HUND_MIN)-$(HUND_MAX)" -n 100); \
+	./$(NAME) $$ARGS | wc -l
+
+check_hundred:
+	ARGS=$$(shuf -i "$(HUND_MIN)-$(HUND_MAX)" -n 100); \
+	./$(NAME) $$ARGS | ./checker_linux $$ARGS
+
+test_five: num_five check_five
+
+num_five:
+	ARGS=$$(shuf -i "$(HUND_MIN)-$(FIVE_MAX)" -n 500); \
+	./$(NAME) $$ARGS | wc -l
+
+check_five:
+	ARGS=$$(shuf -i "$(HUND_MIN)-$(FIVE_MAX)" -n 500); \
+	./$(NAME) $$ARGS | ./checker_linux $$ARGS
 
 clean:
 	$(RM) $(OBJS) #$(BOBJS)
@@ -46,4 +61,4 @@ fclean: clean
 
 re: fclean all
 
-.PHONY: all clean fclean re #bonus
+.PHONY: all clean fclean re

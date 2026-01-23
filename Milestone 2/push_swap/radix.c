@@ -55,7 +55,7 @@ int	*handle_temp(int *stacka, int *norm, int alen)
 			if (norm[i] == stacka[j])
 			{
 				temp[i] = j;
-				break;
+				break ;
 			}
 			j++;
 		}
@@ -95,12 +95,7 @@ void	normalize(int *stacka, int alen, int *norm)
 	int	temp;
 
 	i = 0;
-	while (i < alen)
-	{
-		norm[i] = stacka[i];
-		i++;
-	}
-	i = 0;
+	dup_atonorm(norm, stacka, alen);
 	while (i < alen)
 	{
 		j = i + 1;
@@ -125,27 +120,23 @@ void	normalize(int *stacka, int alen, int *norm)
 void	handle_stack(int *stacka, int *alen, int *stackb, int *blen)
 {
 	int	*normstack;
-	int	i;
+	int	ordered;
 
-	i = 0;
 	normstack = malloc((*alen) * sizeof(int));
 	normalize(stacka, *alen, normstack);
-	while (i < ((*alen) - 1))
-	{
-		if (normstack[i] == i)
-			i++;
-		else
-			break ;
-		if (i == ((*alen) - 1))
-			return ;
-	}
+	ordered = check_if_ordered(normstack, *alen);
+	if (ordered == 1)
+		return ;
 	if (*alen < 6)
 	{
 		radix(normstack, alen, stackb, blen);
 		return ;
 	}
 	else
+	{
+		large_radix(normstack, alen, stackb, blen);
 		large_sort(normstack, alen, stackb, blen);
+	}
 	free(normstack);
 	free(stackb);
 	normstack = NULL;

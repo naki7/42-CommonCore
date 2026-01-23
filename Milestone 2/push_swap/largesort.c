@@ -62,7 +62,7 @@ int	get_lis(int *norm, int size, int *temp)
 	while (i < size)
 	{
 		fill_dynamic_array(norm, dyn_arr, i);
-		if(dyn_arr[0][i] > maxlen)
+		if (dyn_arr[0][i] > maxlen)
 		{
 			maxlen = dyn_arr[0][i];
 			maxindx = i;
@@ -81,29 +81,14 @@ int	get_lis(int *norm, int size, int *temp)
 
 int	build_keep(int *norm, int size, int *keep)
 {
-	int	temp_arr[size];
-	int	temp_len;
-	int	best_arr[size];
+	int	*best_arr;
 	int	best_len;
 	int	i;
 
-	i = 0;
 	best_len = 0;
-	while (i < size)//create as own func, removes 14ish lines
-	{
-		temp_len = get_lis(norm, size, temp_arr);
-		if (best_len < temp_len)
-		{
-			best_len = temp_len;
-			while (temp_len > 0)
-			{
-				temp_len--;
-				best_arr[temp_len] = temp_arr[temp_len];
-			}
-		}
-		i++;
-	}
 	i = 0;
+	best_arr = malloc(size * sizeof(int));
+	get_best_vars(norm, size, &best_len, best_arr);
 	while (i < size)
 	{
 		keep[i] = 0;
@@ -120,13 +105,14 @@ int	build_keep(int *norm, int size, int *keep)
 
 void	large_sort(int *norm, int *alen, int *stackb, int *blen)
 {
-	int	keep[*alen];
+	int	*keep;
 	int	keep_len;
 	int	total;
 	int	i;
 
 	i = 0;
 	total = *alen;
+	keep = malloc((*alen) * sizeof(int));
 	keep_len = build_keep(norm, *alen, keep);
 	while (i < total)
 	{

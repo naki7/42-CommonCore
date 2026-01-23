@@ -37,8 +37,8 @@ int	validate_arg(char *str)
 		if (!(ft_strchr(validset, str[i])))
 			return (0);
 		value = (value * 10) + (str[i] - '0');
-		if (str[0] == '-' && -value < -2147483648)
-			return (0);	
+		if (str[0] == '-' && (value * -1) < -2147483648)
+			return (0);
 		if (str[0] != '-' && value > 2147483647)
 			return (0);
 		i++;
@@ -46,7 +46,7 @@ int	validate_arg(char *str)
 	return (1);
 }
 
-t_stack	**produce_stack(t_stack **a, char **argv, int argc)
+void	produce_stack(t_stack **a, char **argv, int argc)
 {
 	int		i;
 	int		j;
@@ -73,7 +73,6 @@ t_stack	**produce_stack(t_stack **a, char **argv, int argc)
 		}
 		i++;
 	}
-	return (a);
 }
 
 void	push_swap(t_stack **a)
@@ -95,12 +94,12 @@ void	push_swap(t_stack **a)
 
 int	main(int argc, char *argv[])
 {
-	t_stack *a;
+	t_stack	*a;
 
 	a = ft_stacknew(0);
 	if (argc > 1)
 	{
-		a = *produce_stack(&a, argv, argc);
+		produce_stack(&a, argv, argc);
 		push_swap(&a);
 		return (1);
 	}

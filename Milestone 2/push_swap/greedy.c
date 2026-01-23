@@ -15,14 +15,7 @@
 
 int	cost_to_rotate(int a_indx, int b_indx, int *sizes, int *costs)
 {
-	if (a_indx > (sizes[0] / 2))//assign costs in a func to save +-7 lines
-		costs[0] = a_indx - sizes[0];
-	else
-		costs[0] = a_indx;
-	if (b_indx > (sizes[1] / 2))
-		costs[1] = b_indx - sizes[1];
-	else
-		costs[1] = b_indx;
+	init_costs(a_indx, b_indx, sizes, costs);
 	if (costs[0] > 0 && costs[1] > 0)
 	{
 		if (costs[0] >= costs[1])
@@ -50,32 +43,13 @@ int	get_best_indx(int *norm, int alen, int b_val)
 {
 	int	i;
 	int	curr_small;
-	int small_indx;
-	int curr_big;
+	int	curr_big;
 	int	big_indx;
 
-	i = 0;//make func to init these values (save 3-4 lines)
-	curr_small = norm[0];
-	curr_big = norm[0];
-	small_indx = 0;
-	big_indx = 0;
-	while (i < alen)
-	{
-		if (norm[i] < curr_small)//make func to assign values (save 6 lines)
-		{
-			curr_small = norm[i];
-			small_indx = i;
-		}
-		if (norm[i] > curr_big)
-		{
-			curr_big = norm[i];
-			big_indx = i;
-		}
-		i++;
-	}
+	i = 0;
+	big_indx = init_best_index(norm, &curr_small, &curr_big, alen);
 	if (b_val < curr_small || b_val > curr_big)
 		return ((big_indx + 1) % alen);
-	i = 0;
 	while (i < alen - 1)
 	{
 		if (norm[i] < b_val && b_val < norm[i + 1])
@@ -110,7 +84,7 @@ void	get_cheapest_move(int *norm, int *stackb, int *sizes, int *best_costs)
 	}
 }
 
-void	rotate_to_values(int *norm, int *stackb, int*sizes, int*costs)//split into a pos & a neg func
+void	rotate_to_values(int *norm, int *stackb, int*sizes, int*costs)
 {
 	while (costs[0] > 0 && costs[1] > 0)
 	{
@@ -128,22 +102,6 @@ void	rotate_to_values(int *norm, int *stackb, int*sizes, int*costs)//split into 
 		rotate_b(stackb, sizes[1]);
 		costs[1]--;
 	}
-	while (costs[0] < 0 && costs[1] < 0)
-	{
-		rev_rotate_both(norm, sizes[0], stackb, sizes[1]);
-		costs[0]++;
-		costs[1]++;
-	}
-	while (costs[0] < 0)
-	{
-		rev_rotate_a(norm, sizes[0]);
-		costs[0]++;
-	}
-	while (costs[1] < 0)
-	{
-		rev_rotate_b(stackb, sizes[1]);
-		costs[1]++;
-	}
 }
 
 void	greedy(int *norm, int *alen, int *stackb, int *blen)
@@ -158,6 +116,7 @@ void	greedy(int *norm, int *alen, int *stackb, int *blen)
 		sizes[1] = *blen;
 		get_cheapest_move(norm, stackb, sizes, costs);
 		rotate_to_values(norm, stackb, sizes, costs);
+		rev_rotate_to_values(norm, stackb, sizes, costs);
 		pushtoa(norm, alen, stackb, blen);
 	}
 	if (norm[0] < (*alen / 2))

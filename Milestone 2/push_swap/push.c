@@ -21,25 +21,20 @@ void	pushtoa(int *into, int *inlen, int *outof, int *outlen)
 
 	a_i = 0;
 	b_i = *inlen;
-	if (*outlen < 1)
-		return ;
-	else
+	temp = outof[0];
+	(*outlen)--;
+	while (a_i < *outlen)
 	{
-		temp = outof[0];
-		(*outlen)--;
-		while (a_i < *outlen)
-		{
-			outof[a_i] = outof[a_i + 1];
-			a_i++;
-		}
-		(*inlen)++;
-		while (b_i > -1)
-		{
-			into[b_i] = into[b_i - 1];
-			b_i--;
-		}
-		into[0] = temp;
+		outof[a_i] = outof[a_i + 1];
+		a_i++;
 	}
+	(*inlen)++;
+	while (b_i > -1)
+	{
+		into[b_i] = into[b_i - 1];
+		b_i--;
+	}
+	into[0] = temp;
 	write(1, "pa\n", 3);
 }
 
@@ -51,24 +46,19 @@ void	pushtob(int *into, int *inlen, int *outof, int *outlen)
 
 	a_i = 0;
 	b_i = *inlen;
-	if (*outlen < 1)
-		return ;
-	else
+	temp = outof[0];
+	(*outlen)--;
+	while (a_i < *outlen)
 	{
-		temp = outof[0];
-		(*outlen)--;
-		while (a_i < *outlen)
-		{
-			outof[a_i] = outof[a_i + 1];
-			a_i++;
-		}
-		(*inlen)++;
-		while (b_i > -1)
-		{
-			into[b_i] = into[b_i - 1];
-			b_i--;
-		}
-		into[0] = temp;
+		outof[a_i] = outof[a_i + 1];
+		a_i++;
 	}
+	(*inlen)++;
+	while (b_i > -1)
+	{
+		into[b_i] = into[b_i - 1];
+		b_i--;
+	}
+	into[0] = temp;
 	write(1, "pb\n", 3);
 }
