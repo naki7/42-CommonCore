@@ -1,17 +1,22 @@
 # ************************************************************************* #
 #                                                                           #
 #                                                      :::      ::::::::    #
-#  ft_count_harvest_iterative.py                     :+:      :+:    :+:    #
+#  ft_garden_intro.py                                :+:      :+:    :+:    #
 #                                                  +:+ +:+         +:+      #
 #  By: joshde-s <joshde-s@student.42porto.com>   +#+  +:+       +#+         #
 #                                              +#+#+#+#+#+   +#+            #
-#  Created: 2026/01/23 15:01:24 by joshde-s        #+#    #+#               #
-#  Updated: 2026/01/30 14:58:01 by joshde-s        ###   ########.fr        #
+#  Created: 2026/01/30 15:20:46 by joshde-s        #+#    #+#               #
+#  Updated: 2026/01/30 15:33:40 by joshde-s        ###   ########.fr        #
 #                                                                           #
 # ************************************************************************* #
 
-def ft_count_harvest_iterative():
-    days = int(input("Days until harvest: ")) + 1
-    for i in range(1, days):
-        print("Day", i)
-    print("Harvest time!")
+def main():
+    name = 'Sunflower'
+    height = 1.5
+    age = 5
+    print("~~~Loading into Garden~~~\nPlant =", name, "\nHeight =", height,
+          "meters\nAge =", age, "weeks\n~~~Exiting Garden~~~")
+
+
+if __name__ == "__main__":
+    main()
