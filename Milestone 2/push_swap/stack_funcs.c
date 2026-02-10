@@ -52,7 +52,6 @@ void	ft_stackadd_back(t_stack **stack, t_stack *add, char *string)
 		*stack = add;
 		return ;
 	}
-
 	end = *stack;
 	while (end->next != NULL)
 		end = end->next;
@@ -67,8 +66,10 @@ void	produce_arrays(t_stack **a, int **stacka, int **stackb, int stklen)
 	i = 0;
 	temp_a = *a;
 	*stacka = malloc(stklen * sizeof(int));
+	if (!*stacka)
+		return ;
 	*stackb = malloc(stklen * sizeof(int));
-	if (!*stacka || !*stackb)
+	if (!*stackb)
 		return ;
 	while (i < stklen)
 	{

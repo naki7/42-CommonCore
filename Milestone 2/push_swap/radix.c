@@ -47,6 +47,8 @@ int	*handle_temp(int *stacka, int *norm, int alen)
 
 	i = 0;
 	temp = malloc((alen) * sizeof(int));
+	if (temp == NULL)
+		return (temp);
 	while (i < alen)
 	{
 		j = 0;
@@ -125,6 +127,8 @@ void	handle_stack(int *stacka, int *alen, int *stackb, int *blen)
 	int	ordered;
 
 	normstack = malloc((*alen) * sizeof(int));
+	if (normstack == NULL)
+		return ;
 	normalize(stacka, *alen, normstack);
 	ordered = check_if_ordered(normstack, *alen);
 	if (ordered == 1)

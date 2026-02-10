@@ -37,7 +37,11 @@ void	init_dynamic_array(int **dyn_arr, int *len, int *indx, int size)
 	int	i;
 
 	dyn_arr[0] = malloc(size * sizeof(int));
+	if (dyn_arr[0] == NULL)
+		return ;
 	dyn_arr[1] = malloc(size * sizeof(int));
+	if (dyn_arr[1] == NULL)
+		return ;
 	*len = 0;
 	*indx = 0;
 	i = 0;
@@ -87,6 +91,8 @@ int	build_keep(int *norm, int size, int *keep)
 	best_len = 0;
 	i = 0;
 	best_arr = malloc(size * sizeof(int));
+	if (best_arr == NULL)
+		return (best_len);
 	get_best_vars(norm, size, &best_len, best_arr);
 	while (i < size)
 	{
@@ -113,6 +119,8 @@ void	large_sort(int *norm, int *alen, int *stackb, int *blen)
 	i = 0;
 	total = *alen;
 	keep = malloc((*alen) * sizeof(int));
+	if (keep == NULL)
+		return ;
 	keep_len = build_keep(norm, *alen, keep);
 	while (i < total)
 	{
