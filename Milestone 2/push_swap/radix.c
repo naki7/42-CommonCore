@@ -70,19 +70,21 @@ void	swap_to_i(int *stacka, int alen, int *norm)
 	int	j;
 	int	*temp;
 
-	i = -1;
+	i = 0;
 	temp = handle_temp(stacka, norm, alen);
-	while (i++ < alen)
+	while (i < alen)
 	{
-		j = -1;
-		while (j++ < alen)
+		j = 0;
+		while (j < alen)
 		{
 			if (temp[j] == i)
 			{
 				norm[i] = j;
 				break ;
 			}
+			j++;
 		}
+		i++;
 	}
 	free(temp);
 	temp = NULL;
@@ -126,19 +128,20 @@ void	handle_stack(int *stacka, int *alen, int *stackb, int *blen)
 	normalize(stacka, *alen, normstack);
 	ordered = check_if_ordered(normstack, *alen);
 	if (ordered == 1)
-		return ;
-	if (*alen < 6)
 	{
-		radix(normstack, alen, stackb, blen);
+		free_stacks(stacka, stackb, normstack);
 		return ;
 	}
+	if (*alen == 2)
+		rotate_a(stacka, *alen);
+	else if (*alen == 3)
+		sort_three(normstack);
+	else if (*alen < 6)
+		small_sort(normstack, alen, stackb, blen);
 	else
 	{
 		large_radix(normstack, alen, stackb, blen);
 		large_sort(normstack, alen, stackb, blen);
 	}
-	free(normstack);
-	free(stackb);
-	normstack = NULL;
-	stackb = NULL;
+	free_stacks(stacka, stackb, normstack);
 }

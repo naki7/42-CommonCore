@@ -16,7 +16,9 @@ CC = cc
 CFLAGS = -Wall -Wextra -Werror
 COMPILE = $(CC) $(CFLAGS)
 
-CFILES = push_swap.c stack_funcs.c ft_atoi.c ft_split.c ft_strchr.c ft_strlcpy.c ft_strlen.c swap.c push.c rotate.c reverse.c radix.c largesort.c greedy.c large_utils.c radix_utils.c
+CFILES = push_swap.c stack_funcs.c ft_atoi.c ft_split.c ft_strchr.c ft_strlcpy.c \
+		ft_strlen.c swap.c push.c rotate.c reverse.c radix.c largesort.c greedy.c \
+		large_utils.c large_utils_two.c radix_utils.c push_swap_utils.c
 OBJS = $(CFILES:.c=.o)
 
 RM = rm -f

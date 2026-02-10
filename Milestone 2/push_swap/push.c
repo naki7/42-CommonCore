@@ -11,7 +11,6 @@
 /* ************************************************************************** */
 
 #include "libpushswap.h"
-#include <stdio.h>
 
 void	pushtoa(int *into, int *inlen, int *outof, int *outlen)
 {

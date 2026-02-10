@@ -89,6 +89,7 @@ void	get_best_vars(int *norm, int size, int *best_len, int *best_arr)
 		}
 		i++;
 	}
+	free(temp_arr);
 }
 
 void	large_radix(int *norm, int *alen, int *stackb, int *blen)

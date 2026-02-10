@@ -11,7 +11,6 @@
 /* ************************************************************************** */
 
 #include "libpushswap.h"
-#include <stdio.h>
 
 int	ft_stacksize(t_stack *stack)
 {
@@ -41,19 +40,23 @@ t_stack	*ft_stacknew(int value)
 	return (node);
 }
 
-void	ft_stackadd_back(t_stack **stack, t_stack *add)
+void	ft_stackadd_back(t_stack **stack, t_stack *add, char *string)
 {
 	t_stack	*end;
 
-	if (!*stack)
+	free(string);
+	if (!add)
 		return ;
+	if (!*stack)
+	{
+		*stack = add;
+		return ;
+	}
+
 	end = *stack;
 	while (end->next != NULL)
 		end = end->next;
-	if (!end)
-		*stack = add;
-	else
-		end->next = add;
+	end->next = add;
 }
 
 void	produce_arrays(t_stack **a, int **stacka, int **stackb, int stklen)
@@ -73,4 +76,23 @@ void	produce_arrays(t_stack **a, int **stacka, int **stackb, int stklen)
 		stacka[0][i] = temp_a->value;
 		i++;
 	}
+}
+
+void	free_small_stack(t_stack **a, int size)
+{
+	t_stack	*temp;
+
+	temp = *a;
+	if (size >= 6)
+		free(temp->next->next->next->next->next->next);
+	if (size >= 5)
+		free(temp->next->next->next->next->next);
+	if (size >= 4)
+		free(temp->next->next->next->next);
+	if (size >= 3)
+		free(temp->next->next->next);
+	if (size >= 2)
+		free(temp->next->next);
+	free(temp->next);
+	free(temp);
 }

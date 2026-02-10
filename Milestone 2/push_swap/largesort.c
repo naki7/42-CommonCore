@@ -11,7 +11,6 @@
 /* ************************************************************************** */
 
 #include "libpushswap.h"
-#include <stdio.h>
 
 void	fill_dynamic_array(int *norm, int **dyn_arr, int indx)
 {
@@ -69,13 +68,13 @@ int	get_lis(int *norm, int size, int *temp)
 		}
 		i++;
 	}
-	i = maxindx;
-	maxindx = maxlen - 1;
+	i = reset_indexes(&maxindx, maxlen, dyn_arr);
 	while (i != -1)
 	{
 		temp[maxindx--] = i;
 		i = dyn_arr[1][i];
 	}
+	free(dyn_arr[1]);
 	return (maxlen);
 }
 
@@ -100,6 +99,7 @@ int	build_keep(int *norm, int size, int *keep)
 		keep[best_arr[i]] = 1;
 		i++;
 	}
+	free(best_arr);
 	return (best_len);
 }
 
@@ -122,5 +122,6 @@ void	large_sort(int *norm, int *alen, int *stackb, int *blen)
 			rotate_a(norm, *alen);
 		i++;
 	}
+	free(keep);
 	greedy(norm, alen, stackb, blen);
 }

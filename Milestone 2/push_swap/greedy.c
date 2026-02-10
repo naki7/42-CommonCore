@@ -11,7 +11,6 @@
 /* ************************************************************************** */
 
 #include "libpushswap.h"
-#include <stdio.h>
 
 int	cost_to_rotate(int a_indx, int b_indx, int *sizes, int *costs)
 {
