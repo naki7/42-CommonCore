@@ -28,12 +28,10 @@ void	free_larger_stack(t_stack **a)
 	t_stack	*curr_node;
 
 	temp = *a;
-	while (temp->next != NULL)
+	while (temp != NULL)
 	{
 		curr_node = temp;
 		temp = temp->next;
 		free(curr_node);
-		if (temp->next == NULL)
-			free(temp);
 	}
 }

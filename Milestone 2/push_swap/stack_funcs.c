@@ -73,8 +73,9 @@ void	produce_arrays(t_stack **a, int **stacka, int **stackb, int stklen)
 		return ;
 	while (i < stklen)
 	{
+		(*stackb)[i] = 0;
 		temp_a = temp_a->next;
-		stacka[0][i] = temp_a->value;
+		(*stacka)[i] = temp_a->value;
 		i++;
 	}
 }
