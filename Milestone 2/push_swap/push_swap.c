@@ -11,13 +11,6 @@
 /* ************************************************************************** */
 
 #include "libpushswap.h"
-#include <stdio.h>
-
-void	handle_error(void)
-{
-	write(1, "Error\n", 6);
-	exit(0);
-}
 
 int	validate_arg(char *str)
 {
@@ -46,32 +39,50 @@ int	validate_arg(char *str)
 	return (1);
 }
 
-void	produce_stack(t_stack **a, char **argv, int argc)
+void	handle_split(t_stack **a, char **temp, int j)
 {
-	int		i;
-	int		j;
-	char	**temp;
 	t_stack	*node;
 
-	i = 1;
+	if (!validate_arg(temp[j]))
+	{
+		free_split_from(temp, j);
+		free_stack_nodes(a);
+		handle_error();
+	}
+	else
+	{
+		node = ft_stacknew(ft_atoi(temp[j]));
+		if (!node)
+		{
+			free_split_from(temp, j);
+			free_stack_nodes(a);
+			handle_error();
+		}
+		ft_stackadd_back(a, node, temp[j]);
+	}
+}
+
+void	produce_stack(t_stack **a, char **argv, int argc, int i)
+{
+	int		j;
+	char	**temp;
+
 	while (i < argc)
 	{
 		temp = ft_split(argv[i], ' ');
 		if (!temp)
+		{
+			free_stack_nodes(a);
 			handle_error();
+		}
 		j = 0;
 		while (temp[j])
 		{
-			if (!validate_arg(temp[j]))
-				handle_error();
-			else
-			{
-				node = ft_stacknew(ft_atoi(temp[j]));
-				ft_stackadd_back(a, node);
-			}
+			handle_split(a, temp, j);
 			j++;
 		}
 		i++;
+		free(temp);
 	}
 }
 
@@ -87,19 +98,30 @@ void	push_swap(t_stack **a)
 	blen = 0;
 	stackb = NULL;
 	produce_arrays(a, &stacka, &stackb, alen);
+	if (alen < 7)
+		free_small_stack(a, alen);
+	else
+		free_larger_stack(a);
 	if (!stacka || !stackb)
-		handle_error();
+		return ;
 	handle_stack(stacka, &alen, stackb, &blen);
 }
 
 int	main(int argc, char *argv[])
 {
 	t_stack	*a;
+	int		i;
 
 	a = ft_stacknew(0);
+	i = 1;
 	if (argc > 1)
 	{
-		produce_stack(&a, argv, argc);
+		if (argv[1][0] == '\0')
+		{
+			free(a);
+			handle_error();
+		}
+		produce_stack(&a, argv, argc, i);
 		push_swap(&a);
 		return (1);
 	}

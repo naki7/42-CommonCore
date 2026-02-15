@@ -11,7 +11,6 @@
 /* ************************************************************************** */
 
 #include "libpushswap.h"
-#include <stdio.h>
 
 int	cost_to_rotate(int a_indx, int b_indx, int *sizes, int *costs)
 {
@@ -47,6 +46,8 @@ int	get_best_indx(int *norm, int alen, int b_val)
 	int	big_indx;
 
 	i = 0;
+	curr_small = norm[0];
+	curr_big = norm[0];
 	big_indx = init_best_index(norm, &curr_small, &curr_big, alen);
 	if (b_val < curr_small || b_val > curr_big)
 		return ((big_indx + 1) % alen);
@@ -69,6 +70,8 @@ void	get_cheapest_move(int *norm, int *stackb, int *sizes, int *best_costs)
 
 	i = 0;
 	mincost = 2147483647;
+	best_costs[0] = 0;
+	best_costs[1] = 0;
 	while (i < sizes[1])
 	{
 		value = stackb[i];
@@ -110,6 +113,7 @@ void	greedy(int *norm, int *alen, int *stackb, int *blen)
 	int	sizes[2];
 	int	direction;
 
+	direction = 1;
 	while (*blen > 0)
 	{
 		sizes[0] = *alen;

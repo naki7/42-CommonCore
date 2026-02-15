@@ -1,23 +1,37 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_strlen.c                                        :+:      :+:    :+:   */
+/*   large_utils_two.c                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: joshde-s <joshde-s@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/10/14 14:16:03 by joshde-s          #+#    #+#             */
-/*   Updated: 2025/10/16 11:34:14 by joshde-s         ###   ########.fr       */
+/*   Created: 2026/02/09 15:09:45 by joshde-s          #+#    #+#             */
+/*   Updated: 2026/02/10 14:23:39 by joshde-s         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "libft.h"
+#include "libpushswap.h"
 
-size_t	ft_strlen(const char *s)
+int	reset_indexes(int *maxindx, int maxlen, int **dyn_arr)
 {
-	int	len;
+	int	index;
 
-	len = 0;
-	while (s[len] != '\0')
-		len++;
-	return (len);
+	index = *maxindx;
+	*maxindx = maxlen - 1;
+	free(dyn_arr[0]);
+	return (index);
+}
+
+void	free_larger_stack(t_stack **a)
+{
+	t_stack	*temp;
+	t_stack	*curr_node;
+
+	temp = *a;
+	while (temp != NULL)
+	{
+		curr_node = temp;
+		temp = temp->next;
+		free(curr_node);
+	}
 }

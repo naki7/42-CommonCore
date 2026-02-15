@@ -11,7 +11,6 @@
 /* ************************************************************************** */
 
 #include "libpushswap.h"
-#include <stdio.h>
 
 void	pushtoa(int *into, int *inlen, int *outof, int *outlen)
 {
@@ -29,7 +28,7 @@ void	pushtoa(int *into, int *inlen, int *outof, int *outlen)
 		a_i++;
 	}
 	(*inlen)++;
-	while (b_i > -1)
+	while (b_i > 0)
 	{
 		into[b_i] = into[b_i - 1];
 		b_i--;
@@ -54,7 +53,7 @@ void	pushtob(int *into, int *inlen, int *outof, int *outlen)
 		a_i++;
 	}
 	(*inlen)++;
-	while (b_i > -1)
+	while (b_i > 0)
 	{
 		into[b_i] = into[b_i - 1];
 		b_i--;

@@ -9,6 +9,7 @@
 /*   Updated: 2025/10/17 15:32:15 by joshde-s         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
+
 #include "libft.h"
 
 static void	*freevars(char **arr, int num)

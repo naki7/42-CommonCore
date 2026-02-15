@@ -1,38 +1,48 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_strchr.c                                        :+:      :+:    :+:   */
+/*   push_swap_utils.c                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: joshde-s <joshde-s@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/10/14 12:34:05 by joshde-s          #+#    #+#             */
-/*   Updated: 2025/10/21 12:14:44 by joshde-s         ###   ########.fr       */
+/*   Created: 2026/02/10 12:03:19 by joshde-s          #+#    #+#             */
+/*   Updated: 2026/02/10 14:24:00 by joshde-s         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "libft.h"
+#include "libpushswap.h"
 
-char	*ft_strchr(const char *s, int c)
+void	handle_error(void)
 {
-	int				i;
-	unsigned char	ch;
-	char			*ptr;
+	write(2, "Error\n", 6);
+	exit(0);
+}
 
-	i = 0;
-	ch = (unsigned char)c;
-	while (s[i] != '\0')
+void	free_stack_nodes(t_stack **a)
+{
+	t_stack	*temp;
+	t_stack	*next;
+
+	if (!a || !*a)
+		return ;
+	temp = *a;
+	while (temp)
 	{
-		if (ch == s[i])
-		{
-			ptr = (char *)&s[i];
-			return (ptr);
-		}
-		i++;
+		next = temp->next;
+		free(temp);
+		temp = next;
 	}
-	if (s[i] == '\0' && ch == 0)
-	{
-		ptr = (char *)&s[i];
-		return (ptr);
-	}
-	return (NULL);
+	*a = NULL;
+}
+
+void	free_split_from(char **arr, int start)
+{
+	int	i;
+
+	if (!arr)
+		return ;
+	i = start;
+	while (arr[i])
+		free(arr[i++]);
+	free(arr);
 }

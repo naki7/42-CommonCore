@@ -11,7 +11,6 @@
 /* ************************************************************************** */
 
 #include "libpushswap.h"
-#include <stdio.h>
 
 void	fill_dynamic_array(int *norm, int **dyn_arr, int indx)
 {
@@ -38,7 +37,11 @@ void	init_dynamic_array(int **dyn_arr, int *len, int *indx, int size)
 	int	i;
 
 	dyn_arr[0] = malloc(size * sizeof(int));
+	if (dyn_arr[0] == NULL)
+		return ;
 	dyn_arr[1] = malloc(size * sizeof(int));
+	if (dyn_arr[1] == NULL)
+		return ;
 	*len = 0;
 	*indx = 0;
 	i = 0;
@@ -69,13 +72,13 @@ int	get_lis(int *norm, int size, int *temp)
 		}
 		i++;
 	}
-	i = maxindx;
-	maxindx = maxlen - 1;
+	i = reset_indexes(&maxindx, maxlen, dyn_arr);
 	while (i != -1)
 	{
 		temp[maxindx--] = i;
 		i = dyn_arr[1][i];
 	}
+	free(dyn_arr[1]);
 	return (maxlen);
 }
 
@@ -88,6 +91,8 @@ int	build_keep(int *norm, int size, int *keep)
 	best_len = 0;
 	i = 0;
 	best_arr = malloc(size * sizeof(int));
+	if (best_arr == NULL)
+		return (best_len);
 	get_best_vars(norm, size, &best_len, best_arr);
 	while (i < size)
 	{
@@ -100,6 +105,7 @@ int	build_keep(int *norm, int size, int *keep)
 		keep[best_arr[i]] = 1;
 		i++;
 	}
+	free(best_arr);
 	return (best_len);
 }
 
@@ -113,6 +119,8 @@ void	large_sort(int *norm, int *alen, int *stackb, int *blen)
 	i = 0;
 	total = *alen;
 	keep = malloc((*alen) * sizeof(int));
+	if (keep == NULL)
+		return ;
 	keep_len = build_keep(norm, *alen, keep);
 	while (i < total)
 	{
@@ -122,5 +130,6 @@ void	large_sort(int *norm, int *alen, int *stackb, int *blen)
 			rotate_a(norm, *alen);
 		i++;
 	}
+	free(keep);
 	greedy(norm, alen, stackb, blen);
 }

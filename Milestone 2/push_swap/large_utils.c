@@ -39,8 +39,6 @@ int	init_best_index(int *norm, int *curr_small, int *curr_big, int alen)
 
 	i = 0;
 	indx = 0;
-	*curr_small = norm[0];
-	*curr_big = norm[0];
 	while (i < alen)
 	{
 		if (norm[i] < *curr_small)
@@ -75,6 +73,8 @@ void	get_best_vars(int *norm, int size, int *best_len, int *best_arr)
 
 	i = 0;
 	temp_arr = malloc(size * sizeof(int));
+	if (temp_arr == NULL)
+		return ;
 	while (i < size)
 	{
 		temp_len = get_lis(norm, size, temp_arr);
@@ -89,6 +89,7 @@ void	get_best_vars(int *norm, int size, int *best_len, int *best_arr)
 		}
 		i++;
 	}
+	free(temp_arr);
 }
 
 void	large_radix(int *norm, int *alen, int *stackb, int *blen)
