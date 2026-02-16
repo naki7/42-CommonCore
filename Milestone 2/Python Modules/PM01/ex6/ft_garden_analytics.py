@@ -6,7 +6,7 @@
 #  By: joshde-s <joshde-s@student.42porto.com>   +#+  +:+       +#+         #
 #                                              +#+#+#+#+#+   +#+            #
 #  Created: 2026/01/31 15:06:27 by joshde-s        #+#    #+#               #
-#  Updated: 2026/02/05 17:20:34 by joshde-s        ###   ########.fr        #
+#  Updated: 2026/02/16 14:13:10 by joshde-s        ###   ########.fr        #
 #                                                                           #
 # ************************************************************************* #
 
@@ -101,7 +101,7 @@ class Garden:
             if plant.blooming:
                 regular -= 1
                 flowering += 1
-                print(" (blooming)", end="")
+                print(f", {plant.color} flowers (blooming)", end="")
                 if plant.points:
                     flowering -= 1
                     prize += 1
@@ -119,6 +119,7 @@ class Plant:
         """Initialize a Plant instance."""
         self.name = name
         self.height = height
+        self.color = None
         self.blooming = False
         self.points = 0
 
@@ -157,6 +158,7 @@ def main() -> None:
 
     bobs_prizeflower = PrizeFlower("Rose", 80, "Pink", 2)
     bob.plants = [bobs_prizeflower]
+    bob.total_plants = 1
 
     alice.add_plant(Plant("Oak Tree", 100))
     alice.add_plant(FloweringPlant("Rose", 25, "red"))

@@ -6,7 +6,7 @@
 #  By: joshde-s <joshde-s@student.42porto.com>   +#+  +:+       +#+         #
 #                                              +#+#+#+#+#+   +#+            #
 #  Created: 2026/02/06 15:53:49 by joshde-s        #+#    #+#               #
-#  Updated: 2026/02/06 16:43:53 by joshde-s        ###   ########.fr        #
+#  Updated: 2026/02/16 14:29:36 by joshde-s        ###   ########.fr        #
 #                                                                           #
 # ************************************************************************* #
 
@@ -60,7 +60,7 @@ def test_error_types() -> None:
 
 def main() -> None:
     """Initialize the two functions that are being tested"""
-    print("~~~ Error Testing Initializing ~~~")
+    print("~~~ Error Testing Initializing ~~~\n")
     test_error_types()
     print("~~~ All errors tested succesfully! ~~~")
 

@@ -6,7 +6,7 @@
 #  By: joshde-s <joshde-s@student.42porto.com>   +#+  +:+       +#+         #
 #                                              +#+#+#+#+#+   +#+            #
 #  Created: 2026/01/30 16:17:10 by joshde-s        #+#    #+#               #
-#  Updated: 2026/02/05 16:01:18 by joshde-s        ###   ########.fr        #
+#  Updated: 2026/02/16 13:44:28 by joshde-s        ###   ########.fr        #
 #                                                                           #
 # ************************************************************************* #
 
@@ -32,14 +32,14 @@ class Plant:
         self.age(time)
         print(f"{self.name}: {self.height}cm, {self.days} days old", sep="")
         if time > 0:
-            print(f"Growth in {time} days time is: {(time * 0.75)}cm", sep="")
+            print(f"Growth in {time} days time is: +{(time * 0.75)}cm", sep="")
 
 
 def main() -> None:
     """Initialize a plant and display its growth over time."""
     init_days = 16
     p1 = Plant('Spekboom', 5, init_days)
-    print("~~~Day 1~~~\n")
+    print("~~~Day 1~~~")
     time = 0
     p1.get_info(time)
     time = 7

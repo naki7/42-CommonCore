@@ -6,7 +6,7 @@
 #  By: joshde-s <joshde-s@student.42porto.com>   +#+  +:+       +#+         #
 #                                              +#+#+#+#+#+   +#+            #
 #  Created: 2026/02/07 13:59:53 by joshde-s        #+#    #+#               #
-#  Updated: 2026/02/07 14:24:02 by joshde-s        ###   ########.fr        #
+#  Updated: 2026/02/16 16:23:04 by joshde-s        ###   ########.fr        #
 #                                                                           #
 # ************************************************************************* #
 
@@ -15,11 +15,19 @@ def check_plant_health(plant_name: str, water_level: int,
     """This function validates the 3 arguments against certain criteria,
     if the criteria is not met then an error is raised (to be caught later)"""
     if plant_name == "":
-        raise ValueError("Error: Plant name cannot be empty!\n")
-    if water_level < 1 or water_level > 10:
-        raise ValueError(f"Error: Water level {water_level}")
-    if sunlight_hours < 2 or sunlight_hours > 12:
-        raise ValueError(f"Error: Sunlight hours {sunlight_hours}")
+        raise ValueError("Error: Plant name cannot be empty!")
+    if water_level < 1:
+        error = water_level
+        raise ValueError(f"Error: Water level {error} is too low (min 1)")
+    elif water_level > 10:
+        error = water_level
+        raise ValueError(f"Error: Water level {error} is too high (max 10)")
+    if sunlight_hours < 2:
+        error = sunlight_hours
+        raise ValueError(f"Error: Sunlight hours {error} is too low (min 2)")
+    elif sunlight_hours > 12:
+        error = sunlight_hours
+        raise ValueError(f"Error: Sunlight hours {error} is too high (max 12)")
     print(f"Plant {plant_name} is healthy!\n")
 
 
@@ -35,17 +43,17 @@ def test_plant_checks() -> None:
     try:
         check_plant_health("", 1, 6)
     except ValueError as alert:
-        print(alert)
+        print(f"{alert}\n")
     print("Testing bad water level...")
     try:
         check_plant_health("tomato", 15, 6)
     except ValueError as alert:
-        print(f"{alert} is invalid (min: 1 - max: 10)\n")
+        print(f"{alert}\n")
     print("Testing bad sunlight hours...")
     try:
         check_plant_health("tomato", 1, 0)
     except ValueError as alert:
-        print(f"{alert} is invalid (min: 2 - max: 12)\n")
+        print(f"{alert}\n")
     print("~~~ All error raising tests completed! ~~~")
 
 
