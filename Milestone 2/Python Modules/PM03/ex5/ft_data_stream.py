@@ -6,7 +6,7 @@
 #  By: joshde-s <joshde-s@student.42porto.com>   +#+  +:+       +#+         #
 #                                              +#+#+#+#+#+   +#+            #
 #  Created: 2026/02/25 13:31:21 by joshde-s        #+#    #+#               #
-#  Updated: 2026/02/25 18:16:43 by joshde-s        ###   ########.fr        #
+#  Updated: 2026/02/26 13:49:55 by joshde-s        ###   ########.fr        #
 #                                                                           #
 # ************************************************************************* #
 from typing import Generator
@@ -23,6 +23,27 @@ def fibonacci(repeats: int) -> Generator[int, None, None]:
     for n in range(repeats):
         yield a
         a, b = b, a + b
+
+
+def prime_numbers() -> Generator[int, None, None]:
+    """
+    This generator produces prime numbers by starting with a number, then
+    checks to see if the number compared to numbers greater than or equal to 2
+    but smaller than the number itself would create 0 remainder when modulared.
+    The number is then increased by 1 so that the next time it is called a new
+    prime number can be found
+    """
+    current_num: int = 2
+    while True:
+        is_prime: bool = True
+        for i in range(2, int(current_num ** 0.5) + 1):
+            if current_num % i == 0:
+                is_prime = False
+                break
+        if is_prime is True:
+            yield current_num
+        current_num += 1
+
 
 def game_event(count: int) -> Generator[dict[str: int or str], None, None]:
     """
@@ -81,6 +102,7 @@ def main() -> None:
     Then 2 generators will be shown, one to calculate fibonnacci and the other
     to find a number of prime numbers
     """
+    print("=== Game Data Stream Processor ===\n")
     total_events: int = 0
     total_treasures: int = 0
     total_level_ups: int = 0
@@ -108,18 +130,23 @@ def main() -> None:
     print("\n=== Generator Demonstration ===")
     times_to_repreat: int = 10
     times_ran: int = 0
-    print("Fibonacci sequence (first 10): ", end="")
+    print(f"Fibonacci sequence (first {times_to_repreat}): ", end="")
     for num in fibonacci(times_to_repreat):
         times_ran += 1
         if times_ran < times_to_repreat:
             print(f"{num}, ", end="")
         else:
-            print(f"{num}")
+            print(num)
 
     times_to_repreat: int = 5
-    times_ran: int = 0
-    print("Prime numbers (first 5): ")
-    
+    prime_gen: list[int] = iter(prime_numbers())
+    print(f"Prime numbers (first {times_to_repreat}): ", end="")
+    for i in range(times_to_repreat):
+        if i + 1 < times_to_repreat:
+            print(f"{next(prime_gen)}, ", end="")
+        else:
+            print(next(prime_gen))
+
 
 if __name__ == "__main__":
     main()
