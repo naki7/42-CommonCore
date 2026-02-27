@@ -6,7 +6,7 @@
 #  By: joshde-s <joshde-s@student.42porto.com>   +#+  +:+       +#+         #
 #                                              +#+#+#+#+#+   +#+            #
 #  Created: 2026/02/07 14:25:35 by joshde-s        #+#    #+#               #
-#  Updated: 2026/02/16 17:28:17 by joshde-s        ###   ########.fr        #
+#  Updated: 2026/02/27 14:33:52 by joshde-s        ###   ########.fr        #
 #                                                                           #
 # ************************************************************************* #
 
@@ -37,9 +37,9 @@ class GardenManager:
         if plant.name == "":
             raise ValueError("Error adding plant: Plant name cannot be empty!")
         if plant.water < 1 or plant.water > 10:
-            raise ValueError(f"Error: Water level {plant.water}")
+            raise ValueError(f"Error: Water level {plant.water} invalid")
         if plant.sunlight < 2 or plant.sunlight > 12:
-            raise ValueError(f"Error: Sunlight hours {plant.sunlight}")
+            raise ValueError(f"Error: Sunlight hours {plant.sunlight} invalid")
         self.plants = self.plants + [plant]
         print(f"Added {plant.name} successfully")
 
