@@ -18,7 +18,7 @@ class DataProcessor(ABC):
 
 
 class NumericProcessor(DataProcessor):
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__()
         self.count: int = 0
         self.total: int = 0
@@ -47,7 +47,7 @@ class NumericProcessor(DataProcessor):
 
 
 class TextProcessor(DataProcessor):
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__()
         self.words: List[str] = []
         self.num_words: int = 0
@@ -78,7 +78,7 @@ class TextProcessor(DataProcessor):
 
 
 class LogProcessor(DataProcessor):
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__()
         self.words: List[str] = []
         self.num_words: int = 0

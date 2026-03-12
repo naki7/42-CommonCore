@@ -16,8 +16,9 @@ class DataStream(ABC):
 
 
 class SensorStream(DataStream):
-    def __init__(self):
+    def __init__(self, id: str) -> None:
         super().__init__()
+        self.id: str = id
         self.data_count: int = 0
         self.total: int = 0
         self.temp_count: int = 0
@@ -85,8 +86,9 @@ class SensorStream(DataStream):
 
 
 class TransactionStream(DataStream):
-    def __init__(self):
+    def __init__(self, id: str) -> None:
         super().__init__()
+        self.id: str = id
         self.count: int = 0
         self.net: int = 0
 
@@ -148,8 +150,9 @@ class TransactionStream(DataStream):
 
 
 class EventStream(DataStream):
-    def __init__(self):
+    def __init__(self, id: str) -> None:
         super().__init__()
+        self.id: str = id
         self.count: int = 0
         self.errors: int = 0
 
@@ -198,7 +201,7 @@ class EventStream(DataStream):
 
 
 class StreamProcessor:
-    def __init__(self):
+    def __init__(self) -> None:
         self.streams: List[DataStream] = []
 
     def add_stream(self, stream: DataStream) -> None:
@@ -286,9 +289,9 @@ def main() -> None:
     print("=== CODE NEXUS - POLYMORPHIC STREAM SYSTEM ===")
 
     initial_processor = StreamProcessor()
-    initial_processor.add_stream(SensorStream())
-    initial_processor.add_stream(TransactionStream())
-    initial_processor.add_stream(EventStream())
+    initial_processor.add_stream(SensorStream("SENSOR_001"))
+    initial_processor.add_stream(TransactionStream("TRANS_001"))
+    initial_processor.add_stream(EventStream("EVENT_001"))
 
     print("\nInitializing Sensor Stream...")
     sensor_one: List[Dict[str: float]] = [{"temp": 22.5}, {"humidity": 65},
@@ -332,9 +335,9 @@ def main() -> None:
 
     print("\n=== Polymorphic Stream Processing ===")
     polymorphic_processor = StreamProcessor()
-    polymorphic_processor.add_stream(SensorStream())
-    polymorphic_processor.add_stream(TransactionStream())
-    polymorphic_processor.add_stream(EventStream())
+    polymorphic_processor.add_stream(SensorStream("SENSOR_002"))
+    polymorphic_processor.add_stream(TransactionStream("TRANS_002"))
+    polymorphic_processor.add_stream(EventStream("EVENT_002"))
     batch_one: List[List[Union[Dict[str: float], str]]] = [
         [{"temp": 43}, {"humidity": 70}],
         [{"buy": 100}, {"sell": 150}, {"buy": 75}, {"buy": 70}],
