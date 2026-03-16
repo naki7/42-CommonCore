@@ -5,6 +5,7 @@ def main() -> None:
     try:
         archive = open(file_name, "x")
     except FileExistsError:
+        archive.close()
         print("\nERROR: Discovery has already been found. Create a new one.\n")
         print("Data NOT preserved.")
         return
