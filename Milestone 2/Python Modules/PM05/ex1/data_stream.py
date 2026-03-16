@@ -60,7 +60,7 @@ class SensorStream(DataStream):
 
         if criteria is None:
             return data_batch
-        filtered_data: List[Dict[str: int]] = []
+        filtered_data: List[Dict[str, int]] = []
         if criteria == "High-priority":
             for data in data_batch:
                 if data.get("temp") and data["temp"] >= 40:
@@ -79,9 +79,11 @@ class SensorStream(DataStream):
                 elif data.get("pressure") and data["pressure"] < 1080:
                     filtered_data.append({"pressure": data["pressure"]})
             return filtered_data
+        else:
+            raise ValueError("Invalid criteria used!")
 
     def get_stats(self) -> Dict[str, Union[str, int, float]]:
-        stats: Dict[str: int] = {"sensors": self.data_count}
+        stats: Dict[str, int] = {"sensors": self.data_count}
         return stats
 
 
@@ -99,6 +101,8 @@ class TransactionStream(DataStream):
                 self.net += data["buy"]
             elif data.get("sell"):
                 self.net -= data["sell"]
+            else:
+                raise ValueError("Invalid buy/sell input!")
         filler_text: str = "operations, net flow:"
         net_sign: str = ""
         if self.net > 0:
@@ -125,7 +129,7 @@ class TransactionStream(DataStream):
 
         if criteria is None:
             return data_batch
-        filtered_data: List[Dict[str: int]] = []
+        filtered_data: List[Dict[str, int]] = []
         if criteria == "High-priority":
             for data in data_batch:
                 if (data.get("buy") and data["buy"] > 100):
@@ -141,11 +145,10 @@ class TransactionStream(DataStream):
                     filtered_data.append({"sell": data["sell"]})
             return filtered_data
         else:
-            filtered_data = [None]
-            return filtered_data
+            raise ValueError("Invalid criteria used!")
 
     def get_stats(self) -> Dict[str, Union[str, int, float]]:
-        stats: Dict[str: int] = {"trans": self.count}
+        stats: Dict[str, int] = {"trans": self.count}
         return stats
 
 
@@ -170,7 +173,7 @@ class EventStream(DataStream):
 
     def filter_data(self, data_batch: List[Any],
                     criteria: Optional[str] = None) -> List[Any]:
-        if isinstance(data_batch[0], Dict):
+        if isinstance(data_batch[0], dict):
             return None
 
         self.count = 0
@@ -192,11 +195,10 @@ class EventStream(DataStream):
                     filtered_data.append("logout")
             return filtered_data
         else:
-            filtered_data = [None]
-            return filtered_data
+            raise ValueError("Invalid criteria used!")
 
     def get_stats(self) -> Dict[str, Union[str, int, float]]:
-        stats: Dict[str: int] = {"events": self.count}
+        stats: Dict[str, int] = {"events": self.count}
         return stats
 
 
@@ -208,22 +210,25 @@ class StreamProcessor:
         self.streams.append(stream)
 
     def process_streams(self, batches: List[Any]) -> None:
-        if isinstance(batches[0], List) is False:
-            batch_results: Dict[str: int] = {}
+        if isinstance(batches[0], list) is False:
+            results: Dict[str, int] = {}
             for stream in self.streams:
-                batch_results = stream.filter_data(batches, None)
-                if batch_results is not None:
-                    if isinstance(stream, SensorStream):
-                        print("Sensor analysis: ", end="")
-                    elif isinstance(stream, TransactionStream):
-                        print("Transaction analysis: ", end="")
-                    elif isinstance(stream, EventStream):
-                        print("Event analysis: ", end="")
-                    string_result: str = stream.process_batch(batch_results)
-                    print(string_result)
+                try:
+                    results = stream.filter_data(batches, None)
+                    if results is not None:
+                        if isinstance(stream, SensorStream):
+                            print("Sensor analysis: ", end="")
+                        elif isinstance(stream, TransactionStream):
+                            print("Transaction analysis: ", end="")
+                        elif isinstance(stream, EventStream):
+                            print("Event analysis: ", end="")
+                        string_result: str = stream.process_batch(results)
+                        print(string_result)
+                except Exception as alert:
+                    print(f"Error processing stream: {alert}")
 
         else:
-            batch_results: Dict[str: int] = {
+            batch_results: Dict[str, int] = {
                 "sensors": 0,
                 "alerts": 0,
                 "trans": 0,
@@ -234,55 +239,73 @@ class StreamProcessor:
             print("Processing mixed stream types through unified interface...")
             for stream in self.streams:
                 for batch in batches:
-                    morphic_batch: List[Union[Dict[str: int], str]] = []
-                    morphic_batch = stream.filter_data(batch, None)
-                    if morphic_batch is not None:
-                        stream.process_batch(morphic_batch)
-                        batch_stats: Dict[str: int] = stream.get_stats()
-                        if isinstance(stream, SensorStream):
-                            batch_results["sensors"] += batch_stats["sensors"]
-                        elif isinstance(stream, TransactionStream):
-                            batch_results["trans"] += batch_stats["trans"]
-                        elif isinstance(stream, EventStream):
-                            batch_results["events"] += batch_stats["events"]
+                    try:
+                        morphic_batch: List[Union[Dict[str, int], str]] = []
+                        morphic_batch = stream.filter_data(batch, None)
+                        if morphic_batch is not None:
+                            stream.process_batch(morphic_batch)
+                            batch_stats: Dict[str, int] = stream.get_stats()
+                            if isinstance(stream, SensorStream):
+                                batch_results["sensors"] += batch_stats[
+                                    "sensors"]
+                            elif isinstance(stream, TransactionStream):
+                                batch_results["trans"] += batch_stats[
+                                    "trans"]
+                            elif isinstance(stream, EventStream):
+                                batch_results["events"] += batch_stats[
+                                    "events"]
+                    except Exception as alert:
+                        print(f"Error processing stream: {alert}")
 
-                    filtered_batch: List[Union[Dict[str: int], str]] = []
-                    filtered_batch = stream.filter_data(batch, "High-priority")
-                    if filtered_batch is not None:
-                        stream.process_batch(filtered_batch)
-                        batch_stats: Dict[str: int] = stream.get_stats()
-                        if isinstance(stream, SensorStream):
-                            batch_results["alerts"] += batch_stats["sensors"]
-                        elif isinstance(stream, TransactionStream):
-                            batch_results["large"] += batch_stats["trans"]
-                        elif isinstance(stream, EventStream):
-                            batch_results["errors"] += batch_stats["events"]
+                    try:
+                        filtered_batch: List[Union[Dict[str, int], str]] = []
+                        filtered_batch = stream.filter_data(batch,
+                                                            "High-priority")
+                        if filtered_batch is not None:
+                            stream.process_batch(filtered_batch)
+                            batch_stats: Dict[str, int] = stream.get_stats()
+                            if isinstance(stream, SensorStream):
+                                batch_results["alerts"] += batch_stats[
+                                    "sensors"]
+                            elif isinstance(stream, TransactionStream):
+                                batch_results["large"] += batch_stats[
+                                    "trans"]
+                            elif isinstance(stream, EventStream):
+                                batch_results["errors"] += batch_stats[
+                                    "events"]
+                    except Exception as alert:
+                        print(f"Error processing stream: {alert}")
 
             print("\nBatch 1 Results:")
-            print(f"- Sensor data: {batch_results['sensors']}",
-                  "readings processed")
-            print(f"- Transaction data: {batch_results['trans']}",
-                  "operations processed")
-            print(f"- Event data: {batch_results['events']}",
-                  "events processed")
+            try:
+                print(f"- Sensor data: {batch_results['sensors']}",
+                      "readings processed")
+                print(f"- Transaction data: {batch_results['trans']}",
+                      "operations processed")
+                print(f"- Event data: {batch_results['events']}",
+                      "events processed")
 
-            print("\nStream filtering active: High-priority data only")
-            print("Filtered results: ", end="")
-            if batch_results["alerts"] > 0:
-                print(f"{batch_results['alerts']} critical sensor alerts",
-                      end="")
-                if batch_results["large"] > 0 or batch_results["errors"] > 0:
-                    print(", ", end="")
-                else:
-                    print("")
-            if batch_results["large"] > 0:
-                print(f"{batch_results['large']} large transaction", end="")
+                print("\nStream filtering active: High-priority data only")
+                print("Filtered results: ", end="")
+                if batch_results["alerts"] > 0:
+                    print(f"{batch_results['alerts']} critical sensor alerts",
+                          end="")
+                    if batch_results["large"] > 0 or batch_results[
+                            "errors"] > 0:
+                        print(", ", end="")
+                    else:
+                        print("")
+                if batch_results["large"] > 0:
+                    print(f"{batch_results['large']} large transaction",
+                          end="")
+                    if batch_results["errors"] > 0:
+                        print(", ", end="")
+                    else:
+                        print("")
                 if batch_results["errors"] > 0:
-                    print(", ", end="")
-                else:
-                    print("")
-            if batch_results["errors"] > 0:
-                print(f"{batch_results['errors']} error events")
+                    print(f"{batch_results['errors']} error events")
+            except KeyError as alert:
+                print(f"Error processing batch: {alert}")
 
 
 def main() -> None:
@@ -294,7 +317,7 @@ def main() -> None:
     initial_processor.add_stream(EventStream("EVENT_001"))
 
     print("\nInitializing Sensor Stream...")
-    sensor_one: List[Dict[str: float]] = [{"temp": 22.5}, {"humidity": 65},
+    sensor_one: List[Dict[str, float]] = [{"temp": 22.5}, {"humidity": 65},
                                           {"pressure": 1013}]
     print("Stream ID: SENSOR_001, Type: Environmental Data")
     print("Processing sensor batch: [", end="")
@@ -308,7 +331,7 @@ def main() -> None:
     initial_processor.process_streams(sensor_one)
 
     print("\nInitializing Transaction Stream...")
-    trans_one: List[Dict[str: float]] = [{"buy": 100}, {"sell": 150},
+    trans_one: List[Dict[str, float]] = [{"buy": 100}, {"sell": 150},
                                          {"buy": 75}]
     print("Stream ID: TRANS_001, Type: Financial Data")
     print("Processing transaction batch: [", end="")
@@ -338,7 +361,7 @@ def main() -> None:
     polymorphic_processor.add_stream(SensorStream("SENSOR_002"))
     polymorphic_processor.add_stream(TransactionStream("TRANS_002"))
     polymorphic_processor.add_stream(EventStream("EVENT_002"))
-    batch_one: List[List[Union[Dict[str: float], str]]] = [
+    batch_one: List[List[Union[Dict[str, float], str]]] = [
         [{"temp": 43}, {"humidity": 70}],
         [{"buy": 100}, {"sell": 150}, {"buy": 75}, {"buy": 70}],
         ["login", "login", "logout"]

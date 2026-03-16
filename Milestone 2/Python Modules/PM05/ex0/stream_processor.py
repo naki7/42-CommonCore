@@ -103,7 +103,6 @@ class LogProcessor(DataProcessor):
             return False
         except (AttributeError, IndexError):
             return False
-        return True
 
     def format_output(self, result: str) -> str:
         return result
