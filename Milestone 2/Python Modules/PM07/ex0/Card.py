@@ -9,7 +9,7 @@ class Card(ABC):
 
     @abstractmethod
     def play(self, game_state: dict) -> dict:
-        return game_state
+        pass
 
     def get_card_info(self) -> dict:
         card_info: dict = {
@@ -17,6 +17,8 @@ class Card(ABC):
             "cost": self.cost,
             "rarity": self.rarity
         }
+        if self.type:
+            card_info["type"] = self.type
         if self.attack:
             card_info["attack"] = self.attack
         if self.health:
