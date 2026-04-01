@@ -35,6 +35,29 @@ class EliteCard(Card, Combatable, Magical):
         self.attack_result = attack_result
         return attack_result
 
+    def defend(self, incoming_damage: int) -> dict:
+        if (self.health - incoming_damage) < 1:
+            self.still_alive = False
+        defense_result: dict = {
+            "defender": self.name,
+            "damage_taken": incoming_damage,
+            "damage_blocked": self.damage - incoming_damage,
+            "still_alive": self.still_alive
+        }
+        self.defense_result = defense_result
+        return defense_result
+
+    def get_combat_stats(self) -> dict:
+        combat_stats: dict = {}
+        if self.attack_result is not None:
+            combat_stats["Attack result"] = self.attack_result
+        if self.defense_result is not None:
+            combat_stats["Defense result"] = self.defense_result
+        if self.attack_result is None and self.defense_result is None:
+            combat_stats["Attack result"] = "No attack initiated"
+            combat_stats["Defense result"] = "No defense initiated"
+        return combat_stats
+
     def cast_spell(self, spell_name: str, targets: list) -> dict:
         cast_result: dict = {
             "caster": self.name,
@@ -44,3 +67,18 @@ class EliteCard(Card, Combatable, Magical):
         }
         self.cast_result = cast_result
         return cast_result
+
+    def channel_mana(self, amount: int) -> dict:
+        channel_result: dict = {
+            "channeled": amount,
+            "total_mana": self.cost + amount
+        }
+        self.channel_result = channel_result
+        return channel_result
+
+    def get_magic_stats(self) -> dict:
+        magic_stats: dict = {
+            "Spell cast": self.cast_result,
+            "Mana channel": self.channel_result
+        }
+        return magic_stats

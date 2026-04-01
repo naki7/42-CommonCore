@@ -11,17 +11,10 @@ class Magical(ABC):
     def cast_spell(self, spell_name: str, targets: list) -> dict:
         pass
 
+    @abstractmethod
     def channel_mana(self, amount: int) -> dict:
-        channel_result: dict = {
-            "channeled": amount,
-            "total_mana": self.cost + amount
-        }
-        self.channel_result = channel_result
-        return channel_result
+        pass
 
+    @abstractmethod
     def get_magic_stats(self) -> dict:
-        magic_stats: dict = {
-            "Spell cast": self.cast_result,
-            "Mana channel": self.channel_result
-        }
-        return magic_stats
+        pass
