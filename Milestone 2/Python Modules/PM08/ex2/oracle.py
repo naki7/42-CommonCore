@@ -2,7 +2,7 @@ import os
 from dotenv import load_dotenv
 
 
-def get_env_variables(env_variables: list) -> list:
+def get_env_variables(env_variables: dict) -> dict:
 
     for variable in env_variables:
         env_variables[variable] = os.environ.get(variable)
@@ -17,7 +17,7 @@ def get_env_variables(env_variables: list) -> list:
 
 def main() -> None:
     print("\nORACLE STATUS: Reading the Matrix...\n")
-    env_variables: list = {
+    env_variables: dict = {
         "MATRIX_MODE": None,
         "DATABASE_URL": None,
         "API_KEY": None,
@@ -49,10 +49,11 @@ def main() -> None:
         i += 1
 
     print("\nEnvironment security check:")
+    env_str: str = ""
     if none_exists is True:
-        env_str: str = "[KO] .env file not properly configured"
+        env_str = "[KO] .env file not properly configured"
     else:
-        env_str: str = "[OK] .env file properly configured"
+        env_str = "[OK] .env file properly configured"
     if only_none is True:
         print("[KO] .env file/enviornment variables not properly created",
               "\nThe Oracle is blind to configurations.", sep="\n")

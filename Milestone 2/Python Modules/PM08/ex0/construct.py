@@ -9,7 +9,7 @@ def main() -> None:
         print("You're still plugged in")
     else:
         print("Welcome to the construct")
-    path: tuple = site.getsitepackages()
+    path: list = site.getsitepackages()
     print(f"\nCurrent Python: {sys.executable}")
     if os.environ.get('VIRTUAL_ENV') is None:
         print(f"Virtual Environment: {os.environ.get('VIRTUAL_ENV')} detected")

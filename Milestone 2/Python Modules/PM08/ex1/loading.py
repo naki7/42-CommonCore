@@ -10,7 +10,7 @@ def print_not_installed(not_installed_modules: list, modules: list) -> None:
     print("\nMake sure that the requirements.txt file contains:")
     print(f"{modules}\nMake sure to add:\n{not_installed_modules}")
 
-    print("\n\nFor poetry run:\n   > poetry install")
+    print("\n\nFor poetry run:\n   > poetry install --no-root")
     print("\nMake sure that the pyproject.toml file contains:")
     print("[tool.poetry]\nname = 'ex1'\n",
           "version = '1.0.0'\n\n[tool.poetry.dependencies]\n",
@@ -53,10 +53,7 @@ def check_install() -> list:
 def main() -> None:
     print("\nLOADING STATUS: Loading programs...\n")
     installed_modules: list = check_install()
-    pand: any | None = None
-    nump: any | None = None
-    matplot: any | None = None
-    if len(installed_modules) < 3:
+    if len(installed_modules) < 4:
         print("\nAnalysis not possible!")
         return
     for module in installed_modules:
@@ -71,8 +68,8 @@ def main() -> None:
         return
 
     print("\nAnalyzing Matrix data...")
-    time: list = nump.arange(0, 1000)
-    values: list = nump.cumsum(time)
+    time = nump.arange(0, 1000)
+    values = nump.cumsum(time)
 
     print("Processing 1000 data points...")
     frame: dict = {
