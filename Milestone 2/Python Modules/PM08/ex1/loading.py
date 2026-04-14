@@ -1,4 +1,5 @@
 import importlib
+import warnings
 
 
 def print_not_installed(not_installed_modules: list, modules: list) -> None:
@@ -21,6 +22,8 @@ def print_not_installed(not_installed_modules: list, modules: list) -> None:
 
 
 def check_install() -> list:
+    warnings.filterwarnings("ignore", category=UserWarning,
+                            module="matplotlib")
     modules: list = ["pandas", "numpy", "requests", "matplotlib"]
     modules_text: dict = {
         "pandas": "Data manipulation", "numpy": "Numerical computation",
