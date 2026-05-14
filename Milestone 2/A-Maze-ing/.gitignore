@@ -1,0 +1,6 @@
+__pycache__/
+.mypy_cache/
+/matrix/
+*.egg-info
+build/
+dist/

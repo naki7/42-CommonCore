@@ -1,0 +1,5 @@
+# Project dependencies - external packages needed to run the project
+
+./mlx-2.2-py3-none-any.whl
+flake8==7.1.0
+mypy==1.11.1
