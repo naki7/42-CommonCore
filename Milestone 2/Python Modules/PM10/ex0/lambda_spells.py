@@ -72,7 +72,12 @@ def main() -> None:
     print("\nTesting mage stats...")
     stats: dict = mage_stats(og_mages)
     for stat in stats:
-        print(f"{stat}: {stats[stat]}")
+        if stat != "avg_power":
+            print(f"{stat}: {stats[stat]['name']} the",
+                  f"{stats[stat]['element']} Mage has {stats[stat]['power']}",
+                  "power")
+        else:
+            print(f"{stat}: {stats[stat]}")
 
 
 if __name__ == "__main__":

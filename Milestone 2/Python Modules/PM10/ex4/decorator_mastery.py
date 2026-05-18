@@ -38,7 +38,7 @@ def power_validator(min_power: int) -> Callable:
 
 @power_validator(60)
 def unstable_spell(power: int) -> str:
-    return f"Chaotic energy levels of {power} balanced and cast"
+    return f"Chaotic energy levels of {power} (balanced and cast)"
 
 
 def retry_spell(max_attempts: int) -> Callable:
