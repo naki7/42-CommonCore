@@ -1,14 +1,15 @@
 from enum import Enum
 from pydantic import BaseModel, Field, model_validator, ValidationError
 from datetime import datetime
+from typing import Any
 
 
 class Rank(Enum):
-    cadet = 1
-    officer = 2
-    lieutenant = 3
-    captain = 4
-    commander = 5
+    cadet = 'cadet'
+    officer = 'officer'
+    lieutenant = 'lieutenant'
+    captain = 'captain'
+    commander = 'commander'
 
 
 class CrewMember(BaseModel):
@@ -32,7 +33,7 @@ class SpaceMission(BaseModel):
     budget_millions: float = Field(ge=1, le=10000, alias="budget")
 
     @model_validator(mode='after')
-    def mission_validator(self) -> None:
+    def mission_validator(self) -> Any:
         err_str: str = ""
 
         if self.mission_id.startswith("M") is False:
@@ -49,9 +50,9 @@ class SpaceMission(BaseModel):
             if member.is_active is False:
                 err_str = "All members in a crew should be active"
                 raise ValueError(err_str)
-            if member.rank.value == 5:
+            if member.rank.value == 'commander':
                 commander_count += 1
-            elif member.rank.value == 4:
+            elif member.rank.value == 'captain':
                 captain_count += 1
             if member.years_experience >= 5:
                 experienced_count += 1
@@ -99,7 +100,7 @@ def main() -> None:
         miss_id="M2024_MARS",
         miss_name="Mars Colony Establishment",
         place="Mars",
-        launch="2024-01-16T08:00:00",
+        launch=datetime(2024, 1, 16, 8, 00, 00),
         duration=900,
         crew=[sarah, john, alice],
         budget=2500
@@ -113,7 +114,7 @@ def main() -> None:
     print(f"Crew size: {len(mars.crew)}")
     print("Crew members:")
     for member in mars.crew:
-        print(f"- {member.name} ({member.rank.name})",
+        print(f"- {member.name} ({member.rank.value})",
               f"- {member.specialization}")
 
     print("\n=========================================")
@@ -131,14 +132,14 @@ def main() -> None:
             full_crew = [jessica, john, alice]
         except ValidationError as alert:
             print("Expected validation error:")
-            all_errors: dict = alert.errors()
+            all_errors: list = alert.errors()
             for err in all_errors:
                 print(f"{err['loc'][0]}: {err['msg']}")
         mercury: SpaceMission = SpaceMission(
             miss_id="M2024_MERCURY",
             miss_name="Mercury Colony Establishment",
             place="Mercury",
-            launch="2024-01-16T08:00:00",
+            launch=datetime(2024, 1, 16, 8, 00, 00),
             duration=900,
             crew=full_crew,
             budget=2500
@@ -152,7 +153,7 @@ def main() -> None:
         print(f"Crew size: {len(mercury.crew)}")
         print("Crew members:")
         for member in mercury.crew:
-            print(f"- {member.name} ({member.rank.name})",
+            print(f"- {member.name} ({member.rank.value})",
                   f"- {member.specialization}")
     except ValidationError as alert:
         print("Expected validation error:")

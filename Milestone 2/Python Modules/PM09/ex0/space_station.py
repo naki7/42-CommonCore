@@ -24,7 +24,7 @@ def main() -> None:
         crew=6,
         power=85.5,
         oxygen=92.3,
-        maintenance='2077-12-13T20:30:00'
+        maintenance=datetime(2077, 12, 13, 20, 30, 00)
         )
     print("Valid station created:")
     print(f"ID: {valid_station.station_id}",
@@ -47,7 +47,7 @@ def main() -> None:
             crew=25,
             power=85.5,
             oxygen=92.3,
-            maintenance='2077-12-13T20:30:00'
+            maintenance=datetime(2077, 12, 13, 20, 30, 00)
             )
         print(f"ID: {invalid_station.station_id}",
               f"Name: {invalid_station.name}",
@@ -60,7 +60,7 @@ def main() -> None:
         else:
             print("Status: Non-functional")
     except ValidationError as alert:
-        all_errors: dict = alert.errors()
+        all_errors: list = alert.errors()
         for err in all_errors:
             print(f"{err['loc'][0]}: {err['msg']}")
 

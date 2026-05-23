@@ -1,14 +1,14 @@
 from enum import Enum
 from pydantic import BaseModel, Field, model_validator, ValidationError
 from datetime import datetime
-from typing import Optional
+from typing import Optional, Any
 
 
 class ContactType(Enum):
-    radio = 1
-    visual = 2
-    physical = 3
-    telepathic = 4
+    radio = 'radio'
+    visual = 'visual'
+    physical = 'physical'
+    telepathic = 'telepathic'
 
 
 class AlienContact(BaseModel):
@@ -24,7 +24,7 @@ class AlienContact(BaseModel):
     is_verified: bool = Field(default=False, alias='verification')
 
     @model_validator(mode='after')
-    def contact_validator(self) -> None:
+    def contact_validator(self) -> Any:
         err_str: str = ""
         if self.contact_id.startswith("AC") is False:
             err_str = "Contact ID must start with AC"
@@ -49,7 +49,7 @@ def main() -> None:
     print("======================================")
     valid_contact: AlienContact = AlienContact(
         id="AC_2024_001",
-        time="1978-09-11T16:36:45",
+        time=datetime(1978, 9, 11, 16, 36, 45),
         place="Area 51, Nevada",
         strength=8.5,
         duration=45,
@@ -59,7 +59,7 @@ def main() -> None:
     )
     print("Valid contact report:")
     print(f"ID: {valid_contact.contact_id}",
-          f"Type: {valid_contact.contact_type.name}",
+          f"Type: {valid_contact.contact_type.value}",
           f"Location: {valid_contact.location}",
           f"Signal: {valid_contact.signal_strength}/10",
           f"Duration: {valid_contact.duration_minutes} minutes",
@@ -73,7 +73,7 @@ def main() -> None:
         invalid_contact = AlienContact(
             id="AC_2024_002",
             type=ContactType.telepathic,
-            time="1978-12-11T16:36:45",
+            time=datetime(1978, 12, 11, 16, 36, 45),
             place="Area 51, Nevada",
             strength=8.5,
             duration=45,
@@ -82,7 +82,7 @@ def main() -> None:
             verification=True
             )
         print(f"ID: {invalid_contact.contact_id}",
-              f"Type: {invalid_contact.contact_type.name}",
+              f"Type: {invalid_contact.contact_type.value}",
               f"Location: {invalid_contact.location}",
               f"Signal: {invalid_contact.signal_strength}/10",
               f"Duration: {invalid_contact.duration_minutes} minutes",
