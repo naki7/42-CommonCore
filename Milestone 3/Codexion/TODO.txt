@@ -1,0 +1,13 @@
+[] complete codexion
+    [x] implement parser
+        [x] handle erros
+    [] pull parser info
+    [] read time from cpu usage
+    [] create link lists
+        [] coder link list
+        [] dongle link list
+    [] connect parser info and link lists
+    [] monitor burnout across multiple coders
+    [] handle program end cleanly
+        [] output appropriate info
+        [] free all malloc'ed spaces
