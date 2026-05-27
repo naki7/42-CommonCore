@@ -1,36 +1,26 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   codexion.c                                         :+:      :+:    :+:   */
+/*   refresh.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: joshde-s <joshde-s@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2026/05/22 11:31:51 by joshde-s          #+#    #+#             */
-/*   Updated: 2026/05/26 11:51:02 by joshde-s         ###   ########.fr       */
+/*   Created: 2026/05/27 14:43:12 by joshde-s          #+#    #+#             */
+/*   Updated: 2026/05/27 17:36:05 by joshde-s         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "libcodexion.h"
 
-int	main(int argc, char *argv[])
+void	dongle_refresh(t_dongle *dongle)
 {
-	int			arguments[7];
-	char		*priority;
-	int			i;
-	t_monitor	*monitor;
+	int	cooldown;
+	int	i;
 
-	i = 0;
-	*arguments = *parser(argc, argv, arguments);
-	if (arguments[0] == -1)
-		return (0);
-	priority = argv[8];
-	monitor = base_build(arguments, priority);
-	while (i < 7)
-	{
-		printf("%i\n", arguments[i]);
-		i++;
-	}
-	if (i == 7)
-		printf("%s\n", priority);
-	return (1);
+	dongle->usable = 0;
+	printf("%p", &dongle->lock);
+	cooldown = dongle->cooldown;
+	usleep(cooldown);
+	dongle->usable = 1;
+	pthread_cond_signal(&dongle->condition);
 }
