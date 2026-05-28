@@ -6,7 +6,7 @@
 /*   By: joshde-s <joshde-s@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/05/26 14:07:58 by joshde-s          #+#    #+#             */
-/*   Updated: 2026/05/27 14:55:07 by joshde-s         ###   ########.fr       */
+/*   Updated: 2026/05/28 17:26:24 by joshde-s         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,7 @@ void	thread_init(t_monitor *monitor)
 
 	i = 0;
 	curr_group = malloc(sizeof(t_grouper));
-	curr_group->remaining_time = &monitor->remaining_time;
+	curr_group->remaining_time = monitor->remaining_time;
 	curr_group->time_to_compile = monitor->time_to_compile;
 	curr_group->time_to_debug = monitor->time_to_debug;
 	curr_group->time_to_refactor = monitor->time_to_refactor;
@@ -28,14 +28,19 @@ void	thread_init(t_monitor *monitor)
 	{
 		curr_group->coder = monitor->coders[i];
 		pthread_create(&curr_group->coder.thread, NULL, compile, curr_group);
-		pthread_join(curr_group->coder.thread, NULL);
 		i++;
-		if (i == monitor->number_of_coders)
-			return ;
+	}
+	i = 0;
+	while (i < monitor->number_of_coders)
+	{
+		usleep(curr_group->time_to_refactor);
+		printf("i%i\n", i);
+		curr_group->coder = monitor->coders[i++];
+		pthread_join(curr_group->coder.thread, NULL);
 	}
 }
 
-void	*refractor(void *arg)
+void	*refactor(void *arg)
 {
 	t_grouper		*group;
 	unsigned int	timer;
@@ -43,7 +48,7 @@ void	*refractor(void *arg)
 	group = (t_grouper *)arg;
 	timer = group->time_to_refactor;
 	usleep(timer);
-	printf("refractor - %i\n", group->coder.n);
+	printf("refactor - %i\n", group->coder.n);
 	compile(group);
 	return (NULL);
 }
@@ -57,7 +62,7 @@ void	*debug(void *arg)
 	timer = group->time_to_debug;
 	usleep(timer);
 	printf("debug - %i\n", group->coder.n);
-	refractor(group);
+	refactor(group);
 	return (NULL);
 }
 

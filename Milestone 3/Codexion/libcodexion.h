@@ -6,7 +6,7 @@
 /*   By: joshde-s <joshde-s@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/05/22 13:49:29 by joshde-s          #+#    #+#             */
-/*   Updated: 2026/05/27 14:54:51 by joshde-s         ###   ########.fr       */
+/*   Updated: 2026/05/28 17:23:44 by joshde-s         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,7 +51,7 @@ typedef struct s_monitor
 typedef struct s_grouper
 {
 	t_coder			coder;
-	int				*remaining_time;
+	int				remaining_time;
 	int				time_to_compile;
 	int				time_to_debug;
 	int				time_to_refactor;

@@ -6,7 +6,7 @@
 /*   By: joshde-s <joshde-s@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/05/27 14:43:12 by joshde-s          #+#    #+#             */
-/*   Updated: 2026/05/27 17:36:05 by joshde-s         ###   ########.fr       */
+/*   Updated: 2026/05/28 14:13:30 by joshde-s         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,10 +15,8 @@
 void	dongle_refresh(t_dongle *dongle)
 {
 	int	cooldown;
-	int	i;
 
 	dongle->usable = 0;
-	printf("%p", &dongle->lock);
 	cooldown = dongle->cooldown;
 	usleep(cooldown);
 	dongle->usable = 1;

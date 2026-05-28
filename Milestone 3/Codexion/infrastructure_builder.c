@@ -6,7 +6,7 @@
 /*   By: joshde-s <joshde-s@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/05/22 12:23:56 by joshde-s          #+#    #+#             */
-/*   Updated: 2026/05/27 17:09:13 by joshde-s         ###   ########.fr       */
+/*   Updated: 2026/05/28 17:23:45 by joshde-s         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,13 +14,12 @@
 
 t_dongle	dongle_maker(int cooldown)
 {
-	pthread_mutex_t	lock;
-	pthread_cond_t	condition;
 	t_dongle		dongle;
 
-	pthread_mutex_init(&lock, NULL);
-	pthread_cond_init(&condition, NULL);
-	dongle = (t_dongle){1, cooldown, lock, condition};
+	dongle.usable = 1;
+	dongle.cooldown = cooldown;
+	pthread_mutex_init(&dongle.lock, NULL);
+	pthread_cond_init(&dongle.condition, NULL);
 	return (dongle);
 }
 
@@ -41,7 +40,7 @@ t_dongle	*assign_dongles(int dong_num, int cooldown)
 	return (dongles);
 }
 
-pthread_t	thread_maker(int *config)
+pthread_t	thread_maker(void)
 {
 	pthread_t	thread;
 
@@ -68,7 +67,7 @@ t_coder	*assign_coders(int *config, t_dongle *dongles)
 			right = &dongles[0];
 		else
 			right = &dongles[i + 1];
-		thread = thread_maker(config);
+		thread = thread_maker();
 		coders[i] = (t_coder){i + 1, config[1], thread, left, right};
 		i++;
 	}
@@ -80,10 +79,8 @@ void	*base_build(int *configs, char *priority)
 	t_coder			*coders;
 	t_dongle		*dongles;
 	t_monitor		*monitor;
-	pthread_mutex_t	print_lock;
-	void			*args;
+	(void)priority;
 
-	pthread_mutex_init(&print_lock, NULL);
 	dongles = assign_dongles(configs[0], configs[6]);
 	coders = assign_coders(configs, dongles);
 	monitor = malloc(sizeof(t_monitor));
@@ -93,7 +90,7 @@ void	*base_build(int *configs, char *priority)
 	monitor->time_to_compile = configs[2];
 	monitor->time_to_debug = configs[3];
 	monitor->time_to_refactor = configs[4];
-	monitor->print_lock = print_lock;
+	pthread_mutex_init(&monitor->print_lock, NULL);
 	monitor->coders = coders;
 	monitor->dongles = dongles;
 	thread_init(monitor);
