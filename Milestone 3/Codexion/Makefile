@@ -6,7 +6,7 @@
 #    By: joshde-s <joshde-s@student.42porto.com>    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2026/05/22 09:49:55 by joshde-s          #+#    #+#              #
-#    Updated: 2026/05/27 17:49:37 by joshde-s         ###   ########.fr        #
+#    Updated: 2026/05/29 10:11:53 by joshde-s         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -16,7 +16,7 @@ CC = cc
 CFLAGS = -Wall -Wextra -Werror
 COMPILE = $(CC) $(CFLAGS)
 
-CFILES = coder_actions.c codexion.c infrastructure_builder.c parser.c refresh.c
+CFILES = coder_actions.c codexion.c infrastructure_builder.c parser.c dongle_manager.c
 OBJS = $(CFILES:.c=.o)
 
 RM = rm -fr

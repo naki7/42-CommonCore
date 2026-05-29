@@ -6,7 +6,7 @@
 /*   By: joshde-s <joshde-s@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/05/22 11:31:51 by joshde-s          #+#    #+#             */
-/*   Updated: 2026/05/26 11:51:02 by joshde-s         ###   ########.fr       */
+/*   Updated: 2026/05/29 15:27:44 by joshde-s         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,12 +25,5 @@ int	main(int argc, char *argv[])
 		return (0);
 	priority = argv[8];
 	monitor = base_build(arguments, priority);
-	while (i < 7)
-	{
-		printf("%i\n", arguments[i]);
-		i++;
-	}
-	if (i == 7)
-		printf("%s\n", priority);
 	return (1);
 }

@@ -6,7 +6,7 @@
 /*   By: joshde-s <joshde-s@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/05/22 12:23:56 by joshde-s          #+#    #+#             */
-/*   Updated: 2026/05/28 17:23:45 by joshde-s         ###   ########.fr       */
+/*   Updated: 2026/05/29 15:52:35 by joshde-s         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,9 +15,12 @@
 t_dongle	dongle_maker(int cooldown)
 {
 	t_dongle		dongle;
+	struct timeval	tv;
 
 	dongle.usable = 1;
 	dongle.cooldown = cooldown;
+	gettimeofday(&tv, NULL);
+	dongle.usable_time = tv.tv_sec;
 	pthread_mutex_init(&dongle.lock, NULL);
 	pthread_cond_init(&dongle.condition, NULL);
 	return (dongle);
