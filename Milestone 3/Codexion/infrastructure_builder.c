@@ -6,7 +6,7 @@
 /*   By: joshde-s <joshde-s@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/05/22 12:23:56 by joshde-s          #+#    #+#             */
-/*   Updated: 2026/05/29 15:52:35 by joshde-s         ###   ########.fr       */
+/*   Updated: 2026/06/01 12:02:52 by joshde-s         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,8 +21,10 @@ t_dongle	dongle_maker(int cooldown)
 	dongle.cooldown = cooldown;
 	gettimeofday(&tv, NULL);
 	dongle.usable_time = tv.tv_sec;
-	pthread_mutex_init(&dongle.lock, NULL);
-	pthread_cond_init(&dongle.condition, NULL);
+	dongle.lock = malloc(sizeof(pthread_mutex_t));
+	pthread_mutex_init(dongle.lock, NULL);
+	dongle.condition = malloc(sizeof(pthread_cond_t));
+	pthread_cond_init(dongle.condition, NULL);
 	return (dongle);
 }
 
@@ -51,7 +53,7 @@ pthread_t	thread_maker(void)
 	return (thread);
 }
 
-t_coder	*assign_coders(int *config, t_dongle *dongles)
+t_coder	*assign_coders(int *config, t_dongle *dongles, t_monitor *monitor)
 {
 	int			i;
 	t_coder		*coders;
@@ -71,7 +73,7 @@ t_coder	*assign_coders(int *config, t_dongle *dongles)
 		else
 			right = &dongles[i + 1];
 		thread = thread_maker();
-		coders[i] = (t_coder){i + 1, config[1], thread, left, right};
+		coders[i] = (t_coder){i + 1, config[1], thread, left, right, monitor};
 		i++;
 	}
 	return (coders);
@@ -84,16 +86,17 @@ void	*base_build(int *configs, char *priority)
 	t_monitor		*monitor;
 	(void)priority;
 
-	dongles = assign_dongles(configs[0], configs[6]);
-	coders = assign_coders(configs, dongles);
 	monitor = malloc(sizeof(t_monitor));
+	dongles = assign_dongles(configs[0], configs[6]);
+	coders = assign_coders(configs, dongles, monitor);
 	monitor->state = 1;
 	monitor->number_of_coders = configs[0];
 	monitor->remaining_time = configs[1];
 	monitor->time_to_compile = configs[2];
 	monitor->time_to_debug = configs[3];
 	monitor->time_to_refactor = configs[4];
-	pthread_mutex_init(&monitor->print_lock, NULL);
+	monitor->print_lock = malloc(sizeof(pthread_mutex_t));
+	pthread_mutex_init(monitor->print_lock, NULL);
 	monitor->coders = coders;
 	monitor->dongles = dongles;
 	thread_init(monitor);

@@ -6,7 +6,7 @@
 /*   By: joshde-s <joshde-s@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/05/22 12:22:46 by joshde-s          #+#    #+#             */
-/*   Updated: 2026/05/23 15:06:18 by joshde-s         ###   ########.fr       */
+/*   Updated: 2026/06/01 11:37:39 by joshde-s         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -67,7 +67,7 @@ int	validate_args(char *argv[])
 			return (1);
 		i++;
 	}
-	if (strcmp(argv[7], "fifo") == 0 || strcmp(argv[7], "edf") == 0)
+	if (strcmp(argv[8], "fifo") != 0 && strcmp(argv[8], "edf") != 0)
 		return (2);
 	return (3);
 }
