@@ -26,12 +26,15 @@ void	wait_for_dongle(t_dongle *dongle)
 		pthread_cond_wait(dongle->condition, dongle->lock);
 }
 
-void	grab_dongle(t_dongle *dongle, int coder_num)
+void	grab_dongle(t_dongle *dongle, int coder_num, t_dongle *other)
 {
-	pthread_mutex_lock(dongle->lock);
-	wait_for_dongle(dongle);
-	printf("%i has taken a dongle\n", coder_num);
-	dongle->usable = 0;
+    while (other->usable == 1)
+    {
+	    pthread_mutex_lock(dongle->lock);
+	    wait_for_dongle(dongle);
+	    printf("%i has taken a dongle\n", coder_num);
+	    dongle->usable = 0;
+    }
 }
 
 void	release_dongle(t_dongle *dongle, int coder_num)
@@ -41,5 +44,5 @@ void	release_dongle(t_dongle *dongle, int coder_num)
 	dongle->usable = 1;
 	pthread_cond_broadcast(dongle->condition);
 	pthread_mutex_unlock(dongle->lock);
-	printf("%i lets go of their left dongle\n", coder_num);
+	printf("%i lets go of a dongle\n", coder_num);
 }

@@ -62,7 +62,7 @@ void	thread_init(t_monitor *monitor);
 
 long	current_time(void);
 void	wait_for_dongle(t_dongle *dongle);
-void	grab_dongle(t_dongle *dongle, int coder_num);
+void	grab_dongle(t_dongle *dongle, int coder_num, t_dongle *other);
 void	release_dongle(t_dongle *dongle, int coder_num);
 
 #endif

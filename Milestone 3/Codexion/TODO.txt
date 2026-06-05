@@ -8,6 +8,7 @@
         [x] dongle struct
     [x] connect parser info and structs
     [] monitor burnout across multiple coders
+    [] handle printlock
     [] handle program end cleanly
         [] output appropriate info
         [] free all malloc'ed spaces

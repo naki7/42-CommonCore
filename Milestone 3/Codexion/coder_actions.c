@@ -61,16 +61,16 @@ void	*compile(void *arg)
 	t_coder			*coder;
 	unsigned int	timer;
 	t_dongle		*left;
-	//t_dongle		*right;
+	t_dongle		*right;
 
 	coder = (t_coder *)arg;
 	timer = coder->monitor->time_to_compile;
 	left = coder->left;
-	//right = coder->right;
+	right = coder->right;
 	printf("%i is compiling\n", coder->n);
 	usleep(timer * 1000);
 	coder->remaining_compiles--;
-	//release_dongle(right, coder->n);
+	release_dongle(right, coder->n);
 	release_dongle(left, coder->n);
 	return (NULL);
 }
@@ -85,8 +85,8 @@ void	*coder_loop(void *arg)
 	{
 		if (code_arg->remaining_compiles <= 0)
 			break ;
-		grab_dongle(code_arg->left, code_arg->n);
-		//grab_dongle(code_arg->right, code_arg->n);
+		grab_dongle(code_arg->left, code_arg->n, code_arg->right);
+		grab_dongle(code_arg->right, code_arg->n, code_arg->left);
 		compile(code_arg);
 		debug(code_arg);
 		refactor(code_arg);
