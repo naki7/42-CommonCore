@@ -6,7 +6,7 @@
 /*   By: joshde-s <joshde-s@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/05/22 12:23:56 by joshde-s          #+#    #+#             */
-/*   Updated: 2026/06/01 12:02:52 by joshde-s         ###   ########.fr       */
+/*   Updated: 2026/06/02 14:16:12 by joshde-s         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,13 +14,11 @@
 
 t_dongle	dongle_maker(int cooldown)
 {
-	t_dongle		dongle;
-	struct timeval	tv;
+	t_dongle	dongle;
 
 	dongle.usable = 1;
 	dongle.cooldown = cooldown;
-	gettimeofday(&tv, NULL);
-	dongle.usable_time = tv.tv_sec;
+	dongle.usable_time = current_time();
 	dongle.lock = malloc(sizeof(pthread_mutex_t));
 	pthread_mutex_init(dongle.lock, NULL);
 	dongle.condition = malloc(sizeof(pthread_cond_t));
@@ -73,7 +71,8 @@ t_coder	*assign_coders(int *config, t_dongle *dongles, t_monitor *monitor)
 		else
 			right = &dongles[i + 1];
 		thread = thread_maker();
-		coders[i] = (t_coder){i + 1, config[1], thread, left, right, monitor};
+		coders[i] = (t_coder){i + 1, config[1], config[5], thread, left, right,
+			monitor};
 		i++;
 	}
 	return (coders);
@@ -95,6 +94,7 @@ void	*base_build(int *configs, char *priority)
 	monitor->time_to_compile = configs[2];
 	monitor->time_to_debug = configs[3];
 	monitor->time_to_refactor = configs[4];
+	monitor->remaining_compiles = configs[5];
 	monitor->print_lock = malloc(sizeof(pthread_mutex_t));
 	pthread_mutex_init(monitor->print_lock, NULL);
 	monitor->coders = coders;

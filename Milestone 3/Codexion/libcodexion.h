@@ -6,7 +6,7 @@
 /*   By: joshde-s <joshde-s@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/05/22 13:49:29 by joshde-s          #+#    #+#             */
-/*   Updated: 2026/06/01 11:54:52 by joshde-s         ###   ########.fr       */
+/*   Updated: 2026/06/02 14:16:37 by joshde-s         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,6 +23,7 @@ typedef struct s_coder
 {
 	int					n;
 	int					time_to_burnout;
+	int					remaining_compiles;
 	pthread_t			thread;
 	struct s_dongle		*left;
 	struct s_dongle		*right;
@@ -46,6 +47,7 @@ typedef struct s_monitor
 	int				time_to_compile;
 	int				time_to_debug;
 	int				time_to_refactor;
+	int				remaining_compiles;
 	pthread_mutex_t	*print_lock;
 	t_coder			*coders;
 	t_dongle		*dongles;
@@ -58,6 +60,9 @@ void	*base_build(int *configs, char *priority);
 void	*coder_loop(void *arg);
 void	thread_init(t_monitor *monitor);
 
-void	dongle_refresh(t_dongle *dongle);
+long	current_time(void);
+void	wait_for_dongle(t_dongle *dongle);
+void	grab_dongle(t_dongle *dongle, int coder_num);
+void	release_dongle(t_dongle *dongle, int coder_num);
 
 #endif
