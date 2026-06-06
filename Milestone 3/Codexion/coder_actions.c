@@ -85,8 +85,16 @@ void	*coder_loop(void *arg)
 	{
 		if (code_arg->remaining_compiles <= 0)
 			break ;
-		grab_dongle(code_arg->left, code_arg->n, code_arg->right);
-		grab_dongle(code_arg->right, code_arg->n, code_arg->left);
+		if (code_arg->n % 2 == 0)
+		{
+			grab_dongle(code_arg->right, code_arg->n, code_arg->left);
+			grab_dongle(code_arg->left, code_arg->n, code_arg->right);
+		}
+		else
+		{
+			grab_dongle(code_arg->left, code_arg->n, code_arg->right);
+			grab_dongle(code_arg->right, code_arg->n, code_arg->left);
+		}
 		compile(code_arg);
 		debug(code_arg);
 		refactor(code_arg);

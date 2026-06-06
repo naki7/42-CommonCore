@@ -28,19 +28,21 @@ void	wait_for_dongle(t_dongle *dongle)
 
 void	grab_dongle(t_dongle *dongle, int coder_num, t_dongle *other)
 {
-    while (other->usable == 1)
-    {
-	    pthread_mutex_lock(dongle->lock);
-	    wait_for_dongle(dongle);
-	    printf("%i has taken a dongle\n", coder_num);
-	    dongle->usable = 0;
-    }
+	(void)other;
+	pthread_mutex_lock(dongle->lock);
+	wait_for_dongle(dongle);
+	printf("%i has taken a dongle\n", coder_num);
+	dongle->usable = 0;
+	pthread_mutex_unlock(dongle->lock);
 }
 
 void	release_dongle(t_dongle *dongle, int coder_num)
 {
+	pthread_mutex_lock(dongle->lock);
 	dongle->usable_time = current_time() + dongle->cooldown;
+	pthread_mutex_unlock(dongle->lock);
 	usleep(dongle->cooldown * 1000);
+	pthread_mutex_lock(dongle->lock);
 	dongle->usable = 1;
 	pthread_cond_broadcast(dongle->condition);
 	pthread_mutex_unlock(dongle->lock);
