@@ -6,7 +6,7 @@
 /*   By: joshde-s <joshde-s@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/05/27 14:43:12 by joshde-s          #+#    #+#             */
-/*   Updated: 2026/06/02 15:26:35 by joshde-s         ###   ########.fr       */
+/*   Updated: 2026/06/09 11:25:16 by joshde-s         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,12 +26,13 @@ void	wait_for_dongle(t_dongle *dongle)
 		pthread_cond_wait(dongle->condition, dongle->lock);
 }
 
-void	grab_dongle(t_dongle *dongle, int coder_num, t_dongle *other)
+void	grab_dongle(t_dongle *dongle, int coder_num, t_coder *coder)
 {
-	(void)other;
 	pthread_mutex_lock(dongle->lock);
 	wait_for_dongle(dongle);
+	handle_print(coder);
 	printf("%i has taken a dongle\n", coder_num);
+	pthread_mutex_unlock(coder->monitor->print_lock);
 	dongle->usable = 0;
 	pthread_mutex_unlock(dongle->lock);
 }
@@ -46,5 +47,4 @@ void	release_dongle(t_dongle *dongle, int coder_num)
 	dongle->usable = 1;
 	pthread_cond_broadcast(dongle->condition);
 	pthread_mutex_unlock(dongle->lock);
-	printf("%i lets go of a dongle\n", coder_num);
 }

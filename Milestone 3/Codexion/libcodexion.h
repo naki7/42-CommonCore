@@ -6,7 +6,7 @@
 /*   By: joshde-s <joshde-s@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/05/22 13:49:29 by joshde-s          #+#    #+#             */
-/*   Updated: 2026/06/02 14:16:37 by joshde-s         ###   ########.fr       */
+/*   Updated: 2026/06/09 11:26:14 by joshde-s         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,6 +48,7 @@ typedef struct s_monitor
 	int				time_to_debug;
 	int				time_to_refactor;
 	int				remaining_compiles;
+	int				init_time;
 	pthread_mutex_t	*print_lock;
 	t_coder			*coders;
 	t_dongle		*dongles;
@@ -62,7 +63,9 @@ void	thread_init(t_monitor *monitor);
 
 long	current_time(void);
 void	wait_for_dongle(t_dongle *dongle);
-void	grab_dongle(t_dongle *dongle, int coder_num, t_dongle *other);
+void	grab_dongle(t_dongle *dongle, int coder_num, t_coder *coder);
 void	release_dongle(t_dongle *dongle, int coder_num);
+
+void	handle_print(t_coder *coder);
 
 #endif
