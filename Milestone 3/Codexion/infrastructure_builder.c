@@ -6,7 +6,7 @@
 /*   By: joshde-s <joshde-s@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/05/22 12:23:56 by joshde-s          #+#    #+#             */
-/*   Updated: 2026/06/09 10:58:10 by joshde-s         ###   ########.fr       */
+/*   Updated: 2026/06/11 16:56:45 by joshde-s         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,6 +23,8 @@ t_dongle	dongle_maker(int cooldown)
 	pthread_mutex_init(dongle.lock, NULL);
 	dongle.condition = malloc(sizeof(pthread_cond_t));
 	pthread_cond_init(dongle.condition, NULL);
+	dongle.queue = malloc(sizeof(t_request) * 2);
+	dongle.queue_size = 0;
 	return (dongle);
 }
 
@@ -71,8 +73,8 @@ t_coder	*assign_coders(int *config, t_dongle *dongles, t_monitor *monitor)
 		else
 			right = &dongles[i + 1];
 		thread = thread_maker();
-		coders[i] = (t_coder){i + 1, config[1], config[5], thread, left, right,
-			monitor};
+		coders[i] = (t_coder){i + 1, current_time() + config[1], config[5],
+			thread, left, right, monitor};
 		i++;
 	}
 	return (coders);
@@ -87,19 +89,20 @@ void	*base_build(int *configs, char *priority)
 
 	monitor = malloc(sizeof(t_monitor));
 	dongles = assign_dongles(configs[0], configs[6]);
+	monitor->init_time = current_time();
 	coders = assign_coders(configs, dongles, monitor);
 	monitor->state = 1;
 	monitor->number_of_coders = configs[0];
-	monitor->remaining_time = configs[1];
+	monitor->time_to_burnout = configs[1];
 	monitor->time_to_compile = configs[2];
 	monitor->time_to_debug = configs[3];
 	monitor->time_to_refactor = configs[4];
 	monitor->remaining_compiles = configs[5];
-	monitor->init_time = current_time();
 	monitor->print_lock = malloc(sizeof(pthread_mutex_t));
 	pthread_mutex_init(monitor->print_lock, NULL);
 	monitor->coders = coders;
 	monitor->dongles = dongles;
+	monitor->burn_monitor = thread_maker();
 	thread_init(monitor);
 	return (monitor);
 }

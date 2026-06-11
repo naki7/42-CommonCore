@@ -6,42 +6,50 @@
 /*   By: joshde-s <joshde-s@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/08 16:31:15 by joshde-s          #+#    #+#             */
-/*   Updated: 2026/06/09 11:28:31 by joshde-s         ###   ########.fr       */
+/*   Updated: 2026/06/11 13:21:21 by joshde-s         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "libcodexion.h"
 
-void	handle_print(t_coder *coder)
+void	handle_print(t_coder *coder, char *message)
 {
-	int		curr_time;
+	long	curr_time;
 
 	curr_time = current_time() - coder->monitor->init_time;
 	pthread_mutex_lock(coder->monitor->print_lock);
-	printf("%i ", curr_time / 1000);
+	printf("%lu %i %s\n", curr_time / 1000, coder->n, message);
+	pthread_mutex_unlock(coder->monitor->print_lock);
 }
 
-// void	burnout_monitor(t_monitor *monitor)
-// {
-// 	int	original_count;
-// 	int	curr_count;
+void	*track_burnout(void *arg)
+{
+	int			i;
+	t_monitor	*monitor;
 
-// 	original_count = monitor->number_of_coders;
-// 	curr_count = 0;
-// 	while (curr_count <= original_count)
-// 	{
-// 		if (monitor->remaining_compiles < 1)
-// 			break ;
-// 		if (monitor->coders[curr_count].time_to_burnout <= current_time())
-// 		{
-// 			if (monitor->coders[curr_count].remaining_compiles > 0)
-// 			{
-// 				printf("%i burned out\n", curr_count + 1);
-// 				exit(0);
-// 			}
-// 		}
-// 		original_count++;
-// 		if (curr_count > original_count)
-// 			curr_count = 0;
-// 	}
-// }
+	monitor = (t_monitor *)arg;
+	while (monitor->state)
+	{
+		i = 0;
+		if (monitor->remaining_compiles == 0)
+			monitor->state = 0;
+		else
+		{
+			while (i < monitor->number_of_coders)
+			{
+				if (monitor->coders[i].next_deadline <= current_time())
+				{
+					if (monitor->coders[i].remaining_compiles > 0)
+					{
+						handle_print(&monitor->coders[i], "burned out");
+						monitor->state = 0;
+						exit(0);
+					}
+				}
+				i++;
+			}
+			usleep(1000);
+		}
+	}
+	return (NULL);
+}

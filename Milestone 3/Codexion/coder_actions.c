@@ -6,7 +6,7 @@
 /*   By: joshde-s <joshde-s@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/05/26 14:07:58 by joshde-s          #+#    #+#             */
-/*   Updated: 2026/06/09 11:35:12 by joshde-s         ###   ########.fr       */
+/*   Updated: 2026/06/11 17:12:46 by joshde-s         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,12 +17,14 @@ void	thread_init(t_monitor *monitor)
 	int			i;
 
 	i = 0;
+	pthread_create(&monitor->burn_monitor, NULL, track_burnout, monitor);
 	while (i < monitor->number_of_coders)
 	{
 		pthread_create(&monitor->coders[i].thread, NULL, coder_loop,
 			&monitor->coders[i]);
 		i++;
 	}
+	pthread_join(monitor->burn_monitor, NULL);
 	i = 0;
 	while (i < monitor->number_of_coders)
 	{
@@ -38,9 +40,7 @@ void	*refactor(void *arg)
 
 	coder = (t_coder *)arg;
 	timer = coder->monitor->time_to_refactor;
-	handle_print(coder);
-	printf("%i is refactoring\n", coder->n);
-	pthread_mutex_unlock(coder->monitor->print_lock);
+	handle_print(coder, "is refactoring");
 	usleep(timer * 1000);
 	return (NULL);
 }
@@ -52,9 +52,7 @@ void	*debug(void *arg)
 
 	coder = (t_coder *)arg;
 	timer = coder->monitor->time_to_debug;
-	handle_print(coder);
-	printf("%i is debugging\n", coder->n);
-	pthread_mutex_unlock(coder->monitor->print_lock);
+	handle_print(coder, "is debugging");
 	usleep(timer * 1000);
 	return (NULL);
 }
@@ -70,13 +68,12 @@ void	*compile(void *arg)
 	timer = coder->monitor->time_to_compile;
 	left = coder->left;
 	right = coder->right;
-	handle_print(coder);
-	printf("%i is compiling\n", coder->n);
-	pthread_mutex_unlock(coder->monitor->print_lock);
+	coder->next_deadline = current_time() + coder->monitor->time_to_burnout;
+	handle_print(coder, "is compiling");
 	usleep(timer * 1000);
 	coder->remaining_compiles--;
-	release_dongle(right, coder->n);
-	release_dongle(left, coder->n);
+	release_dongle(right);
+	release_dongle(left);
 	return (NULL);
 }
 
@@ -89,13 +86,13 @@ void	*coder_loop(void *arg)
 	{
 		if (code_arg->n % 2 == 0)
 		{
-			grab_dongle(code_arg->right, code_arg->n, code_arg);
-			grab_dongle(code_arg->left, code_arg->n, code_arg);
+			grab_dongle(code_arg->right, code_arg);
+			grab_dongle(code_arg->left, code_arg);
 		}
 		else
 		{
-			grab_dongle(code_arg->left, code_arg->n, code_arg);
-			grab_dongle(code_arg->right, code_arg->n, code_arg);
+			grab_dongle(code_arg->left, code_arg);
+			grab_dongle(code_arg->right, code_arg);
 		}
 		compile(code_arg);
 		if (code_arg->remaining_compiles < 1)
@@ -103,10 +100,7 @@ void	*coder_loop(void *arg)
 		debug(code_arg);
 		refactor(code_arg);
 	}
-	handle_print(code_arg);
-	printf("coder %i finished with %i remaining cycles\n", code_arg->n,
-		code_arg->remaining_compiles);
-	pthread_mutex_unlock(code_arg->monitor->print_lock);
+	handle_print(code_arg, "finished with 0 remaining compiles");
 	code_arg->monitor->remaining_compiles--;
 	return (NULL);
 }

@@ -3,12 +3,14 @@
         [x] handle erros
     [x] pull parser info
     [] read time from cpu usage
+	[] fix time stamps to be miliseconds
     [x] create structs
         [x] coder struct
         [x] dongle struct
     [x] connect parser info and structs
-    [] monitor burnout across multiple coders
-    [] handle printlock
+    [x] monitor burnout across multiple coders
+    [x] handle printlock
+	[] build in scheduler
     [] handle program end cleanly
         [] output appropriate info
         [] free all malloc'ed spaces
