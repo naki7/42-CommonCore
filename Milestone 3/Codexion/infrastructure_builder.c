@@ -6,13 +6,13 @@
 /*   By: joshde-s <joshde-s@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/05/22 12:23:56 by joshde-s          #+#    #+#             */
-/*   Updated: 2026/06/11 16:56:45 by joshde-s         ###   ########.fr       */
+/*   Updated: 2026/06/12 10:13:28 by joshde-s         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "libcodexion.h"
 
-t_dongle	dongle_maker(int cooldown)
+t_dongle	dongle_maker(int cooldown, char *priority)
 {
 	t_dongle	dongle;
 
@@ -25,10 +25,11 @@ t_dongle	dongle_maker(int cooldown)
 	pthread_cond_init(dongle.condition, NULL);
 	dongle.queue = malloc(sizeof(t_request) * 2);
 	dongle.queue_size = 0;
+	dongle.priority = priority;
 	return (dongle);
 }
 
-t_dongle	*assign_dongles(int dong_num, int cooldown)
+t_dongle	*assign_dongles(int dong_num, int cooldown, char *priority)
 {
 	int				i;
 	t_dongle		*dongles;
@@ -39,7 +40,7 @@ t_dongle	*assign_dongles(int dong_num, int cooldown)
 		return (NULL);
 	while (i < dong_num)
 	{
-		dongles[i] = dongle_maker(cooldown);
+		dongles[i] = dongle_maker(cooldown, priority);
 		i++;
 	}
 	return (dongles);
@@ -85,10 +86,9 @@ void	*base_build(int *configs, char *priority)
 	t_coder			*coders;
 	t_dongle		*dongles;
 	t_monitor		*monitor;
-	(void)priority;
 
 	monitor = malloc(sizeof(t_monitor));
-	dongles = assign_dongles(configs[0], configs[6]);
+	dongles = assign_dongles(configs[0], configs[6], priority);
 	monitor->init_time = current_time();
 	coders = assign_coders(configs, dongles, monitor);
 	monitor->state = 1;

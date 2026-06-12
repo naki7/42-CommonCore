@@ -6,7 +6,7 @@
 /*   By: joshde-s <joshde-s@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/05/22 13:49:29 by joshde-s          #+#    #+#             */
-/*   Updated: 2026/06/11 17:11:59 by joshde-s         ###   ########.fr       */
+/*   Updated: 2026/06/12 10:10:47 by joshde-s         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,6 +46,7 @@ typedef struct s_dongle
 	pthread_cond_t		*condition;
 	struct s_request	*queue;
 	int					queue_size;
+	char				*priority;
 }	t_dongle;
 
 typedef struct s_monitor

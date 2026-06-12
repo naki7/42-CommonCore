@@ -6,7 +6,7 @@
 /*   By: joshde-s <joshde-s@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/05/27 14:43:12 by joshde-s          #+#    #+#             */
-/*   Updated: 2026/06/11 17:26:18 by joshde-s         ###   ########.fr       */
+/*   Updated: 2026/06/12 10:10:43 by joshde-s         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,8 +18,18 @@ void	join_queue(t_dongle *dongle, t_coder *coder)
 		dongle->queue[0] = (t_request){coder->n, current_time(),
 			coder->next_deadline};
 	else if (dongle->queue_size == 1)
-		dongle->queue[1] = (t_request){coder->n, current_time(),
-			coder->next_deadline};
+	{
+		if (coder->next_deadline > dongle->queue[0].next_deadline ||
+			dongle->priority == "fifo")
+			dongle->queue[1] = (t_request){coder->n, current_time(),
+				coder->next_deadline};
+		else
+		{
+			dongle->queue[1] = dongle->queue[0];
+			dongle->queue[0] = (t_request){coder->n, current_time(),
+				coder->next_deadline};
+		}
+	}
 	dongle->queue_size++;
 }
 

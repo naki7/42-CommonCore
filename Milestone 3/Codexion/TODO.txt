@@ -10,8 +10,8 @@
     [x] connect parser info and structs
     [x] monitor burnout across multiple coders
     [x] handle printlock
-	[] build in scheduler
+	[x] build in scheduler
     [] handle program end cleanly
-        [] output appropriate info
+        [x] output appropriate info
         [] free all malloc'ed spaces
     [] finish README
