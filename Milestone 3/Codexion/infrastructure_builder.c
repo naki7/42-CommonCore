@@ -6,7 +6,7 @@
 /*   By: joshde-s <joshde-s@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/05/22 12:23:56 by joshde-s          #+#    #+#             */
-/*   Updated: 2026/06/12 10:13:28 by joshde-s         ###   ########.fr       */
+/*   Updated: 2026/06/12 16:08:52 by joshde-s         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,10 +20,23 @@ t_dongle	dongle_maker(int cooldown, char *priority)
 	dongle.cooldown = cooldown;
 	dongle.usable_time = current_time();
 	dongle.lock = malloc(sizeof(pthread_mutex_t));
+	if (dongle.lock == NULL)
+		return (dongle);
 	pthread_mutex_init(dongle.lock, NULL);
 	dongle.condition = malloc(sizeof(pthread_cond_t));
+	if (dongle.condition == NULL)
+		{
+			free(dongle.lock);
+			return (dongle);
+		}
 	pthread_cond_init(dongle.condition, NULL);
 	dongle.queue = malloc(sizeof(t_request) * 2);
+	if (dongle.queue == NULL)
+		{
+			free(dongle.lock);
+			free(dongle.condition);
+			return (dongle);
+		}
 	dongle.queue_size = 0;
 	dongle.priority = priority;
 	return (dongle);
@@ -41,6 +54,9 @@ t_dongle	*assign_dongles(int dong_num, int cooldown, char *priority)
 	while (i < dong_num)
 	{
 		dongles[i] = dongle_maker(cooldown, priority);
+		if (dongles[i].lock == NULL || dongles[i].condition == NULL ||
+			dongles[i].queue == NULL)
+			return (free_dongles(dongles, i));
 		i++;
 	}
 	return (dongles);
@@ -65,7 +81,10 @@ t_coder	*assign_coders(int *config, t_dongle *dongles, t_monitor *monitor)
 	i = 0;
 	coders = malloc(sizeof(t_coder) * config[0]);
 	if (!coders)
-		return (NULL);
+	{
+		free(dongles);
+		return (free_dongles(dongles, config[0]));
+	}
 	while (i < config[0])
 	{
 		left = &dongles[i];
@@ -88,9 +107,16 @@ void	*base_build(int *configs, char *priority)
 	t_monitor		*monitor;
 
 	monitor = malloc(sizeof(t_monitor));
+	if (monitor == NULL)
+		return (NULL);
+	monitor->print_lock = NULL;
 	dongles = assign_dongles(configs[0], configs[6], priority);
+	if (dongles == NULL)
+		return (monitor);
 	monitor->init_time = current_time();
 	coders = assign_coders(configs, dongles, monitor);
+	if (coders == NULL)
+		return (monitor);
 	monitor->state = 1;
 	monitor->number_of_coders = configs[0];
 	monitor->time_to_burnout = configs[1];
@@ -99,6 +125,8 @@ void	*base_build(int *configs, char *priority)
 	monitor->time_to_refactor = configs[4];
 	monitor->remaining_compiles = configs[5];
 	monitor->print_lock = malloc(sizeof(pthread_mutex_t));
+	if (monitor->print_lock == NULL)
+		return (monitor);//add to codexion main to check if print_lock is null
 	pthread_mutex_init(monitor->print_lock, NULL);
 	monitor->coders = coders;
 	monitor->dongles = dongles;

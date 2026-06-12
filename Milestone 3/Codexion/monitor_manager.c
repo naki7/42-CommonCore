@@ -6,7 +6,7 @@
 /*   By: joshde-s <joshde-s@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/08 16:31:15 by joshde-s          #+#    #+#             */
-/*   Updated: 2026/06/11 13:21:21 by joshde-s         ###   ########.fr       */
+/*   Updated: 2026/06/12 15:47:34 by joshde-s         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,7 +43,7 @@ void	*track_burnout(void *arg)
 					{
 						handle_print(&monitor->coders[i], "burned out");
 						monitor->state = 0;
-						exit(0);
+						return (NULL);
 					}
 				}
 				i++;

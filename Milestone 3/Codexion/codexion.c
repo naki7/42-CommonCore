@@ -6,7 +6,7 @@
 /*   By: joshde-s <joshde-s@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/05/22 11:31:51 by joshde-s          #+#    #+#             */
-/*   Updated: 2026/06/08 10:16:56 by joshde-s         ###   ########.fr       */
+/*   Updated: 2026/06/12 15:36:59 by joshde-s         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,7 +23,19 @@ int	main(int argc, char *argv[])
 		return (0);
 	priority = argv[8];
 	monitor = base_build(arguments, priority);
-	if (monitor->remaining_compiles < 1)
+	if (monitor == NULL)
+	{
+		printf("Error while malloc'ing the monitor");
+		return (0);
+	}
+	else if (monitor->print_lock == NULL)
+	{
+		printf("Error while malloc'ing the dongles/coders");
+		free(monitor);
+		return (0);
+	}
+	else if (monitor->remaining_compiles < 1)
 		printf("All coders compiled successfully!\n");
+	free_monitor(monitor);
 	return (1);
 }

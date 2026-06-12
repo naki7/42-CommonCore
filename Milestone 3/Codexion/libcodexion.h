@@ -6,7 +6,7 @@
 /*   By: joshde-s <joshde-s@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/05/22 13:49:29 by joshde-s          #+#    #+#             */
-/*   Updated: 2026/06/12 10:10:47 by joshde-s         ###   ########.fr       */
+/*   Updated: 2026/06/12 11:30:13 by joshde-s         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -79,5 +79,9 @@ void	release_dongle(t_dongle *dongle);
 
 void	handle_print(t_coder *coder, char *message);
 void	*track_burnout(void *arg);
+
+void	*free_dongles(t_dongle *dongles, int size);
+void	*free_coders(t_coder *coders, int size);
+void	*free_monitor(t_monitor *monitor);
 
 #endif

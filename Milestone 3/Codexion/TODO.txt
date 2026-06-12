@@ -13,5 +13,8 @@
 	[x] build in scheduler
     [] handle program end cleanly
         [x] output appropriate info
-        [] free all malloc'ed spaces
+        [x] free all malloc'ed spaces
+		[] handle all NULL mallocs properly
+		[] fix program ending timing when burnout happens
+		[] double check the fifo stuff to actually check arrival time
     [] finish README
