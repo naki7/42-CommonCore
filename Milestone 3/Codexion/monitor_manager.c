@@ -6,7 +6,7 @@
 /*   By: joshde-s <joshde-s@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/08 16:31:15 by joshde-s          #+#    #+#             */
-/*   Updated: 2026/06/12 15:47:34 by joshde-s         ###   ########.fr       */
+/*   Updated: 2026/06/15 18:00:01 by joshde-s         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,7 +18,7 @@ void	handle_print(t_coder *coder, char *message)
 
 	curr_time = current_time() - coder->monitor->init_time;
 	pthread_mutex_lock(coder->monitor->print_lock);
-	printf("%lu %i %s\n", curr_time / 1000, coder->n, message);
+	printf("%lu %i %s\n", curr_time, coder->n, message);
 	pthread_mutex_unlock(coder->monitor->print_lock);
 }
 
@@ -26,12 +26,16 @@ void	*track_burnout(void *arg)
 {
 	int			i;
 	t_monitor	*monitor;
+	int			remaining;
 
 	monitor = (t_monitor *)arg;
 	while (monitor->state)
 	{
 		i = 0;
-		if (monitor->remaining_compiles == 0)
+		pthread_mutex_lock(monitor->compile_lock);
+		remaining = monitor->remaining_compiles;
+		pthread_mutex_unlock(monitor->compile_lock);
+		if (remaining == 0)
 			monitor->state = 0;
 		else
 		{
@@ -43,6 +47,13 @@ void	*track_burnout(void *arg)
 					{
 						handle_print(&monitor->coders[i], "burned out");
 						monitor->state = 0;
+						while (i < monitor->number_of_coders)
+						{
+							pthread_mutex_lock(monitor->dongles[i].lock);
+							pthread_cond_broadcast(monitor->dongles[i].condition);
+							pthread_mutex_unlock(monitor->dongles[i].lock);
+							i++;
+						}
 						return (NULL);
 					}
 				}

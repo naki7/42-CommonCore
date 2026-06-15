@@ -6,7 +6,7 @@
 /*   By: joshde-s <joshde-s@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/05/22 12:23:56 by joshde-s          #+#    #+#             */
-/*   Updated: 2026/06/12 16:08:52 by joshde-s         ###   ########.fr       */
+/*   Updated: 2026/06/15 15:33:21 by joshde-s         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -82,8 +82,9 @@ t_coder	*assign_coders(int *config, t_dongle *dongles, t_monitor *monitor)
 	coders = malloc(sizeof(t_coder) * config[0]);
 	if (!coders)
 	{
+		free_dongles(dongles, config[0]);
 		free(dongles);
-		return (free_dongles(dongles, config[0]));
+		return (NULL);
 	}
 	while (i < config[0])
 	{
@@ -126,8 +127,12 @@ void	*base_build(int *configs, char *priority)
 	monitor->remaining_compiles = configs[5];
 	monitor->print_lock = malloc(sizeof(pthread_mutex_t));
 	if (monitor->print_lock == NULL)
-		return (monitor);//add to codexion main to check if print_lock is null
+		return (monitor);
 	pthread_mutex_init(monitor->print_lock, NULL);
+	monitor->compile_lock = malloc(sizeof(pthread_mutex_t));
+	if (monitor->compile_lock == NULL)
+		return (monitor);
+	pthread_mutex_init(monitor->compile_lock, NULL);
 	monitor->coders = coders;
 	monitor->dongles = dongles;
 	monitor->burn_monitor = thread_maker();
