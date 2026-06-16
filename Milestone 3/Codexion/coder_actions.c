@@ -6,7 +6,7 @@
 /*   By: joshde-s <joshde-s@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/05/26 14:07:58 by joshde-s          #+#    #+#             */
-/*   Updated: 2026/06/15 18:03:11 by joshde-s         ###   ########.fr       */
+/*   Updated: 2026/06/16 10:13:36 by joshde-s         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,9 +39,12 @@ void	*refactor(void *arg)
 	unsigned int	timer;
 
 	coder = (t_coder *)arg;
-	timer = coder->monitor->time_to_refactor;
-	handle_print(coder, "is refactoring");
-	usleep(timer * 1000);
+	if (coder->monitor->state != 0)
+	{
+		timer = coder->monitor->time_to_refactor;
+		handle_print(coder, "is refactoring");
+		usleep(timer * 1000);
+	}
 	return (NULL);
 }
 
@@ -51,9 +54,12 @@ void	*debug(void *arg)
 	unsigned int	timer;
 
 	coder = (t_coder *)arg;
-	timer = coder->monitor->time_to_debug;
-	handle_print(coder, "is debugging");
-	usleep(timer * 1000);
+	if (coder->monitor->state != 0)
+	{
+		timer = coder->monitor->time_to_debug;
+		handle_print(coder, "is debugging");
+		usleep(timer * 1000);
+	}
 	return (NULL);
 }
 
@@ -125,7 +131,8 @@ void	*coder_loop(void *arg)
 	if (code_arg->remaining_compiles < 1)
 		handle_print(code_arg, "finished with 0 remaining compiles");
 	pthread_mutex_lock(code_arg->monitor->compile_lock);
-	code_arg->monitor->remaining_compiles--;
+	if (code_arg->monitor->state != 0)
+		code_arg->monitor->remaining_compiles--;
 	pthread_mutex_unlock(code_arg->monitor->compile_lock);
 	return (NULL);
 }

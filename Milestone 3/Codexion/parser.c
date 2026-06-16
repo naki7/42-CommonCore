@@ -6,7 +6,7 @@
 /*   By: joshde-s <joshde-s@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/05/22 12:22:46 by joshde-s          #+#    #+#             */
-/*   Updated: 2026/06/01 11:37:39 by joshde-s         ###   ########.fr       */
+/*   Updated: 2026/06/16 10:19:31 by joshde-s         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,7 @@
 int	*handle_error(int err_code, int *arguments)
 {
 	if (err_code == 1)
-		printf("Invalid item used in first 7 arguments, use an int\n");
+		printf("Invalid item used in first 7 arguments, use a valid int\n");
 	else if (err_code == 2)
 		printf("Invalid input used for <scheduler>, use \"fifo\" | \"edf\"\n");
 	arguments[0] = -1;

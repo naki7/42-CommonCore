@@ -6,7 +6,7 @@
 /*   By: joshde-s <joshde-s@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/05/22 12:23:56 by joshde-s          #+#    #+#             */
-/*   Updated: 2026/06/15 15:33:21 by joshde-s         ###   ########.fr       */
+/*   Updated: 2026/06/16 09:41:38 by joshde-s         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -124,7 +124,7 @@ void	*base_build(int *configs, char *priority)
 	monitor->time_to_compile = configs[2];
 	monitor->time_to_debug = configs[3];
 	monitor->time_to_refactor = configs[4];
-	monitor->remaining_compiles = configs[5];
+	monitor->remaining_compiles = configs[0];
 	monitor->print_lock = malloc(sizeof(pthread_mutex_t));
 	if (monitor->print_lock == NULL)
 		return (monitor);

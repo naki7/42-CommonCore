@@ -6,7 +6,7 @@
 /*   By: joshde-s <joshde-s@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/08 16:31:15 by joshde-s          #+#    #+#             */
-/*   Updated: 2026/06/15 18:00:01 by joshde-s         ###   ########.fr       */
+/*   Updated: 2026/06/16 10:15:20 by joshde-s         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,7 +35,7 @@ void	*track_burnout(void *arg)
 		pthread_mutex_lock(monitor->compile_lock);
 		remaining = monitor->remaining_compiles;
 		pthread_mutex_unlock(monitor->compile_lock);
-		if (remaining == 0)
+		if (remaining < 1)
 			monitor->state = 0;
 		else
 		{
@@ -47,9 +47,11 @@ void	*track_burnout(void *arg)
 					{
 						handle_print(&monitor->coders[i], "burned out");
 						monitor->state = 0;
+						i = 0;
 						while (i < monitor->number_of_coders)
 						{
 							pthread_mutex_lock(monitor->dongles[i].lock);
+							monitor->dongles->cooldown = 0;
 							pthread_cond_broadcast(monitor->dongles[i].condition);
 							pthread_mutex_unlock(monitor->dongles[i].lock);
 							i++;
