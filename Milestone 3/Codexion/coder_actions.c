@@ -6,7 +6,7 @@
 /*   By: joshde-s <joshde-s@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/05/26 14:07:58 by joshde-s          #+#    #+#             */
-/*   Updated: 2026/06/16 10:13:36 by joshde-s         ###   ########.fr       */
+/*   Updated: 2026/06/17 10:44:49 by joshde-s         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -128,8 +128,6 @@ void	*coder_loop(void *arg)
 		debug(code_arg);
 		refactor(code_arg);
 	}
-	if (code_arg->remaining_compiles < 1)
-		handle_print(code_arg, "finished with 0 remaining compiles");
 	pthread_mutex_lock(code_arg->monitor->compile_lock);
 	if (code_arg->monitor->state != 0)
 		code_arg->monitor->remaining_compiles--;

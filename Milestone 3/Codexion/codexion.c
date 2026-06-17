@@ -34,8 +34,6 @@ int	main(int argc, char *argv[])
 		free(monitor);
 		return (0);
 	}
-	else if (monitor->remaining_compiles < 1)
-		printf("All coders compiled successfully!\n");
 	free_monitor(monitor);
 	return (1);
 }
