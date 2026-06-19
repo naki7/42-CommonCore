@@ -17,4 +17,4 @@
 		[x] handle all NULL mallocs properly
 		[x] fix program ending timing when burnout happens
 		[x] double check the fifo stuff to actually check arrival time
-    [] finish README
+    [x] finish README

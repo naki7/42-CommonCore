@@ -6,7 +6,7 @@
 #    By: joshde-s <joshde-s@student.42porto.com>    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2026/05/22 09:49:55 by joshde-s          #+#    #+#              #
-#    Updated: 2026/06/19 11:52:52 by joshde-s         ###   ########.fr        #
+#    Updated: 2026/06/19 15:28:24 by joshde-s         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -29,8 +29,7 @@ $(NAME): $(OBJS)
 		$(COMPILE) $(OBJS) -o $(NAME)
 
 test: $(OBJS)
-		$(CC) $(OBJS) -o $(NAME)
-		./$(NAME) 3 1200 200 200 200 7 100 "fifo"
+		./$(NAME) 8 3000 100 100 100 7 500 "fifo"
 
 clean:
 	$(RM) $(OBJS)
