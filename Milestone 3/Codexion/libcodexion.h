@@ -6,7 +6,7 @@
 /*   By: joshde-s <joshde-s@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/05/22 13:49:29 by joshde-s          #+#    #+#             */
-/*   Updated: 2026/06/15 18:00:17 by joshde-s         ###   ########.fr       */
+/*   Updated: 2026/06/19 11:31:35 by joshde-s         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -66,23 +66,30 @@ typedef struct s_monitor
 	pthread_t		burn_monitor;
 }	t_monitor;
 
-int		*parser(int argc, char *argv[], int *arguments);
+int			*parser(int argc, char *argv[], int *arguments);
 
-void	*base_build(int *configs, char *priority);
+void		*base_build(int *configs, char *priority);
 
-void	*coder_loop(void *arg);
-void	thread_init(t_monitor *monitor);
+t_coder		*assign_coders(int *config, t_dongle *dongles, t_monitor *monitor);
+pthread_t	thread_maker(void);
 
-long	current_time(void);
-void	wait_for_dongle(t_dongle *dongle, int coder_num, t_monitor *monitor);
-int	grab_dongle(t_dongle *dongle, t_coder *coder);
-void	release_dongle(t_dongle *dongle);
+void		thread_init(t_monitor *monitor);
+void		*coder_loop(void *arg);
 
-void	handle_print(t_coder *coder, char *message);
-void	*track_burnout(void *arg);
+void		*compile(void *arg);
+void		*debug(void *arg);
+void		*refactor(void *arg);
 
-void	*free_dongles(t_dongle *dongles, int size);
-void	*free_coders(t_coder *coders, int size);
-void	*free_monitor(t_monitor *monitor);
+long		current_time(void);
+void		wait_for_dongle(t_dongle *dongle, int coder_num,
+				t_monitor *monitor);
+int			grab_dongle(t_dongle *dongle, t_coder *coder);
+void		release_dongle(t_dongle *dongle);
+
+void		handle_print(t_coder *coder, char *message);
+void		*track_burnout(void *arg);
+
+void		*free_dongles(t_dongle *dongles, int size);
+void		*free_monitor(t_monitor *monitor);
 
 #endif
