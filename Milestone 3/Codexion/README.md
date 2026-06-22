@@ -47,7 +47,23 @@ Codexion breaks individual process threads into managable pipelines by passing
 
 ### Use Executable with predefined values
 
-- Run 'make tests'
+- Run 'make "command_here"' where "command_here" is the commands listed below:
+	- "easy" - runs a simple set of arguments
+	- "medium" - runs a mildly complex set of arguments
+	- "hard" - runs a highly complex set of arguments that is meant to be more
+		constrained
+	- "edf" - runs a time constrained test with the edf scheduler, this pushes
+		the schedule tester to its limit
+	- "one_coder" - runs the program with only 1 coder which should after the
+		burnout amount of time, result in a burnout
+	- "burnout" - runs the program with a burnout time that will happen almost
+		immmediately
+	- "no_cooldown" - runs the program with dongle cooldown set to 0 which makes
+		for a very rapid result
+	- "large_cooldown" - uses a large cooldown timer for the dongles so that it
+		can be easier to see when dongles cooldown
+	- "all_tests" - runs all the above commands with 5 second breaks in-between
+		each run
 
 ### Utility
 
