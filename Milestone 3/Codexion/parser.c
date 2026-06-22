@@ -6,7 +6,7 @@
 /*   By: joshde-s <joshde-s@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/05/22 12:22:46 by joshde-s          #+#    #+#             */
-/*   Updated: 2026/06/16 10:19:31 by joshde-s         ###   ########.fr       */
+/*   Updated: 2026/06/22 12:05:21 by joshde-s         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,7 +63,9 @@ int	validate_args(char *argv[])
 				return (1);
 			j++;
 		}
-		if (atoi(argv[i]) < 1)
+		if ((i == 1 || i == 6) && atoi(argv[i]) < 1)
+			return (1);
+		else if (i != 1 && i != 6 && atoi(argv[i]) < 0)
 			return (1);
 		i++;
 	}

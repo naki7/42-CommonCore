@@ -6,29 +6,17 @@
 /*   By: joshde-s <joshde-s@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/05/27 14:43:12 by joshde-s          #+#    #+#             */
-/*   Updated: 2026/06/19 10:49:44 by joshde-s         ###   ########.fr       */
+/*   Updated: 2026/06/22 11:28:42 by joshde-s         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "libcodexion.h"
 
-long	current_time(void)
+void	prioritize_queue(t_dongle *dongle, t_coder *coder)
 {
-	struct timeval	tv;
-
-	gettimeofday(&tv, NULL);
-	return (tv.tv_sec * 1000L + tv.tv_usec / 1000L);
-}
-
-void	join_queue(t_dongle *dongle, t_coder *coder)
-{
-	if (dongle->queue_size == 0)
-		dongle->queue[0] = (t_request){coder->n, current_time(),
-			coder->next_deadline};
-	else if (dongle->queue_size == 1)
+	if (strcmp(dongle->priority, "edf") == 0)
 	{
-		if (coder->next_deadline > dongle->queue[0].next_deadline
-			|| strcmp(dongle->priority, "fifo") == 0)
+		if (coder->next_deadline >= dongle->queue[0].next_deadline)
 			dongle->queue[1] = (t_request){coder->n, current_time(),
 				coder->next_deadline};
 		else
@@ -38,6 +26,27 @@ void	join_queue(t_dongle *dongle, t_coder *coder)
 				coder->next_deadline};
 		}
 	}
+	else
+	{
+		if (current_time() >= dongle->queue[0].join_time)
+			dongle->queue[1] = (t_request){coder->n, current_time(),
+				coder->next_deadline};
+		else
+		{
+			dongle->queue[1] = dongle->queue[0];
+			dongle->queue[0] = (t_request){coder->n, current_time(),
+				coder->next_deadline};
+		}
+	}
+}
+
+void	join_queue(t_dongle *dongle, t_coder *coder)
+{
+	if (dongle->queue_size == 0)
+		dongle->queue[0] = (t_request){coder->n, current_time(),
+			coder->next_deadline};
+	else if (dongle->queue_size == 1)
+		prioritize_queue(dongle, coder);
 	dongle->queue_size++;
 }
 

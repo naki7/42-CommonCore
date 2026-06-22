@@ -6,11 +6,19 @@
 /*   By: joshde-s <joshde-s@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/05/22 12:23:56 by joshde-s          #+#    #+#             */
-/*   Updated: 2026/06/19 11:47:14 by joshde-s         ###   ########.fr       */
+/*   Updated: 2026/06/22 10:04:38 by joshde-s         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "libcodexion.h"
+
+long	current_time(void)
+{
+	struct timeval	tv;
+
+	gettimeofday(&tv, NULL);
+	return (tv.tv_sec * 1000L + tv.tv_usec / 1000L);
+}
 
 t_dongle	dongle_maker(int cooldown, char *priority)
 {

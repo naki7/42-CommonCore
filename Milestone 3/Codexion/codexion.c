@@ -6,7 +6,7 @@
 /*   By: joshde-s <joshde-s@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/05/22 11:31:51 by joshde-s          #+#    #+#             */
-/*   Updated: 2026/06/18 14:17:52 by joshde-s         ###   ########.fr       */
+/*   Updated: 2026/06/22 11:52:10 by joshde-s         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,5 +35,5 @@ int	main(int argc, char *argv[])
 		return (0);
 	}
 	free_monitor(monitor);
-	return (1);
+	return (0);
 }

@@ -1,8 +1,7 @@
-[] complete codexion
+[x] complete codexion
     [x] implement parser
         [x] handle erros
     [x] pull parser info
-    [] read time from cpu usage
 	[x] fix time stamps to be miliseconds
     [x] create structs
         [x] coder struct

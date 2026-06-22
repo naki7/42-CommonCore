@@ -6,7 +6,7 @@
 /*   By: joshde-s <joshde-s@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/08 16:31:15 by joshde-s          #+#    #+#             */
-/*   Updated: 2026/06/18 15:06:15 by joshde-s         ###   ########.fr       */
+/*   Updated: 2026/06/22 10:59:35 by joshde-s         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,7 +32,7 @@ void	handle_burnout(t_monitor *monitor, t_coder *coder)
 	while (i < monitor->number_of_coders)
 	{
 		pthread_mutex_lock(monitor->dongles[i].lock);
-		monitor->dongles->cooldown = 0;
+		monitor->dongles[i].cooldown = 0;
 		pthread_cond_broadcast(monitor->dongles[i].condition);
 		pthread_mutex_unlock(monitor->dongles[i].lock);
 		i++;
