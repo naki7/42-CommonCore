@@ -62,6 +62,11 @@ Codexion breaks individual process threads into managable pipelines by passing
 		for a very rapid result
 	- "large_cooldown" - uses a large cooldown timer for the dongles so that it
 		can be easier to see when dongles cooldown
+	- "valgrind_ok" - checks the program with valgrind for leaks on an easy run
+	- "valgrind_burnout" - checks the program with valgrind for leaks for when it
+		results in burnout
+	- "valgrind_no_args" - checks the program with valgrind for leaks for when no
+		arguments are used on the command line
 	- "all_tests" - runs all the above commands with 5 second breaks in-between
 		each run
 

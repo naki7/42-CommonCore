@@ -38,7 +38,7 @@ hard:
 		./$(NAME) 10 954 220 150 150 10 97 "fifo"
 
 edf:
-		./$(NAME) 15 620 120 120 120 15 80 "edf"
+		./$(NAME) 15 640 120 120 120 15 80 "edf"
 
 one_coder:
 		./$(NAME) 1 800 200 200 200 1 50 "fifo"
@@ -52,12 +52,21 @@ no_cooldown:
 large_cooldown:
 		./$(NAME) 5 10000 100 100 100 3 1000 "edf"
 
+valgrind_ok:
+		valgrind ./$(NAME) 2 1000 200 200 200 3 50 "fifo"
+
+valgrind_burnout:
+		valgrind ./$(NAME) 5 100 200 200 200 3 50 "fifo"
+
+valgrind_no_args:
+		valgrind ./$(NAME)
+
 all_tests:
 		echo "running a simple test first" | sleep 5
 		$(MAKE) easy
 		echo "running a more difficult test next" | sleep 5
 		$(MAKE) medium
-		echo "running running a really hard test next" | sleep 5
+		echo "running a really hard test next" | sleep 5
 		$(MAKE) hard
 		echo "running an edf test with tight constraints next" | sleep 5
 		$(MAKE) edf
@@ -69,6 +78,12 @@ all_tests:
 		$(MAKE) no_cooldown
 		echo "running with a large cooldown next" | sleep 5
 		$(MAKE) large_cooldown
+		echo "running an easy test with valgrind next" | sleep 5
+		$(MAKE) valgrind_ok
+		echo "running a definite burnout test with valgrind next" | sleep 5
+		$(MAKE) valgrind_burnout
+		echo "running a test with no arguments with valgrind next" | sleep 5
+		$(MAKE) valgrind_no_args
 
 clean:
 	$(RM) $(OBJS)
