@@ -21,7 +21,8 @@ The multi-thread part of this project comes from the compiling threads, as
 	as long as they are not using each others shared resources (the same dongle
 	being used by another coder). If the coders can not compile their code
 	before their task timer runs out, then they will be considered a burnout and
-	the entire program will end. However, if each coder is able to complete the specified number of compiles as individuals without burning out, then the
+	the entire program will end. However, if each coder is able to complete the
+	specified number of compiles as individuals without burning out, then the
 	program completes as a success.
 
 A scheduling process is chosen, either specifying "fifo"(First In First Out)
@@ -31,6 +32,40 @@ A scheduling process is chosen, either specifying "fifo"(First In First Out)
 	on the other hand checks each coder to see which one has the least amount
 	of time before they burnout, thus prioritizing not burning out over
 	possible mistakes.
+	
+Coffman's conditions are made up of 4 notable instances where deadlocks can occur.
+	These are related to hold & wait, preemption, circular wait, and mutual
+	exclusion. These situation primarily revolve around sitautions where multiple
+	coders could try to grab the same dongle at the same time, or each coder
+	grabbing their left dongle at the same time, both these situations lead to
+	the coders waiting indefinitely for both dongles as the other dongle they need
+	will always be held by another coder thus meaning no coder will get to compile.
+	
+The issues on deadlock were resolved by making it so that each even number and each odd
+	numbered coder takes their dongle either left first, or right first, thus giving
+	each coder the time to grab both a left and right dongles before letting their
+	neighbor grab theirs.
+
+Starvation prevention is handled by releasing dongles and giving them to priority based
+	on either join or deadline times. Cooldown was handled by updating each dongle's
+	cooldown directly, sending it through condition to wakeup the coders and updating
+	their burnout timer. Burnout was constantly tracked by a monitoring thread which
+	would constantly check each coder's burnout timer ever milisecond. The log was
+	also serialized through the monitor by attaching a mutex_t to it, this allowed
+	the printing function to be locked and unlocked before and after each print was
+	used.
+
+Pthread_mutex_t and pthread_cond_t were both used by the dongles and the print lock.
+	this was helpful as mutex is what directly gets locked and unlocked thus preventing
+	other threads from using the process while using the process itself. The condition
+	on the other hand would be sent out to signal to all waiting dongles, that if
+	they are the next one in the heap queue to use the dongle, that they can go and
+	use that process/dongle. Since the monitor is constantly aware of all coders, the
+	monitor can have altered states that then will cause each coder to behave the right
+	way such as stopping operations when burnout happens. This also manages the race
+	condition as coders can behave as if on their own, dividing themselves base on
+	even or odd identity, mean while the monitor safe runs and watches in it own thread
+	along side them and only stepping in when it matters.
 
 ### Simplified
 Codexion breaks individual process threads into managable pipelines by passing
