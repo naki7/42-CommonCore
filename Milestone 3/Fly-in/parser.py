@@ -18,8 +18,8 @@ def string_splitter(line: str) -> dict:
 
 class HubStruct(BaseModel):
     name: str = Field(min_length=1)
-    x: int = Field(ge=0)
-    y: int = Field(ge=0)
+    x: int = Field()
+    y: int = Field()
     zone: Union[str, None] = Field(default='normal')
     color: Union[str, None] = Field(default='none')
     max_drones: Union[int, None] = Field(ge=0, default=1)
@@ -214,6 +214,10 @@ def connection_handler(config_arr: list, hub_names: list) -> dict:
                         raise ValueError(f'max_link_capacity={connection[2]}')
                     else:
                         connect_dict[link].append(connection[2])
+    # add the default to connections without a specified criteria
+    for connection in connect_dict:
+        if len(connect_dict[connection]) != 3:
+            connect_dict[connection].append(1)
 
     return connect_dict
 
@@ -237,15 +241,17 @@ def parser(origin_arr: list) -> dict:
 
     # parses the hubs
     hub_dict = hub_handler(config_arr)
+    config_dict['hubs'] = {}
     for key in hub_dict:
-        config_dict[key] = hub_dict[key]
+        config_dict['hubs'][key] = hub_dict[key]
 
     # parses the connections
     hub_names = [hub_dict[key].name for key in hub_dict if key != 'nb_drones']
     connections_dict = connection_handler(config_arr, hub_names)
     # instead of printing add to main dict
+    config_dict['connections'] = {}
     for key in connections_dict:
-        config_dict[key] = connections_dict[key]
+        config_dict['connections'][key] = connections_dict[key]
     return config_dict
 
 
@@ -266,7 +272,7 @@ def parser_main(config_file: TextIO) -> dict:
 
     try:
         parse_result = parser(origin_arr)
-        print(parse_result)
+        return parse_result
     except ValueError as alert:
         if f'{alert}' == 'nb_drones':
             print(f'Error: {alert} not on first line\n    Found on line 1')
@@ -280,4 +286,4 @@ def parser_main(config_file: TextIO) -> dict:
                           f"of {config_file}")
 
 
-parser_main("./maps/easy/01_linear_path.txt")
+print(parser_main("./maps/hard/01_maze_nightmare.txt"))
