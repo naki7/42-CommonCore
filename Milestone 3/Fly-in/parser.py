@@ -8,7 +8,11 @@ def string_splitter(line: str) -> dict:
     dict_set: dict = {}
 
     result_arr = line.split(': ')
-    dict_set = {result_arr[0]: int(result_arr[1])}
+    try:
+        dict_set = {result_arr[0]: int(result_arr[1])}
+    except IndexError:
+        print('invalid input for keys and pairs')
+        raise ValueError(f'{line}')
     return dict_set
 
 
@@ -31,7 +35,8 @@ class HubStruct(BaseModel):
     def values_validator(self) -> Any:
         zone_arr: list = ['normal', 'blocked', 'restricted', 'priority']
         if zone_arr.count(self.zone) != 1:
-            raise ValueError("invalid zone inserted")
+            print('invalid zone inserted')
+            raise ValueError(f'{self.zone}')
         return self
 
 
@@ -52,9 +57,17 @@ def hub_handler(config_arr: list) -> dict:
 
     # check for valid num of start and end hubs (1 each)
     if len(start_hub) != 1:
-        raise ValueError("Incorrect number of start_hubs")
+        print('Incorrect number of start_hubs')
+        if len(start_hub) < 1:
+            raise ValueError('no start_hubs')
+        else:
+            raise ValueError(f'{start_hub[1]}')
     elif len(end_hub) != 1:
-        raise ValueError("Incorrect number of end_hubs")
+        print('Incorrect number of end_hubs')
+        if len(start_hub) < 1:
+            raise ValueError('no start_hubs')
+        else:
+            raise ValueError(f'{start_hub[1]}')
 
     # validate and assign each line/hub
     for line in hub_arr:
@@ -68,7 +81,8 @@ def hub_handler(config_arr: list) -> dict:
         if name_arr.count(temp_arr[1]) == 0:
             name_arr.append(temp_arr[1])
         else:
-            raise ValueError('multiple hubs with the same name')
+            print('multiple hubs with the same name')
+            raise ValueError(f'{line}')
 
         zone: str = None
         color: str = None
@@ -79,24 +93,28 @@ def hub_handler(config_arr: list) -> dict:
 
             # check if the zone's name has a dash
             if temp_arr[1].count('-') != 0:
-                raise ValueError('dash in zone name')
+                print('dash in zone name')
+                raise ValueError(f'{item}')
 
             # handle metadata first
             if temp_extra[0] == 'zone':
                 if zone is None:
                     zone = temp_extra[1]
                 else:
-                    raise ValueError('More than 1 zone')
+                    print('More than 1 zone')
+                    raise ValueError(f'{item}')
             elif temp_extra[0] == 'color':
                 if color is None:
                     color = temp_extra[1]
                 else:
-                    raise ValueError('More than 1 color')
+                    print('More than 1 color')
+                    raise ValueError(f'{item}')
             elif temp_extra[0] == 'max_drones':
                 if max_drones is None:
                     max_drones = int(temp_extra[1])
                 else:
-                    raise ValueError('More than 1 max_drones')
+                    print('More than 1 max_drones')
+                    raise ValueError(f'{item}')
             elif len(extras_arr) != 0:
                 raise ValueError(temp_extra)
 
@@ -139,34 +157,46 @@ def connection_handler(config_arr: list, hub_names: list) -> dict:
                       line[1].find('max_link_capacity') != -1]
     hub_dict: dict = {}
 
-    # remove all extra text so just the connections themselves remain
+    # removes all extra text so just the connections themselves remain
     connect_arr = [line[1] for line in connect_arr]
 
+    # loops over each connection to split the connections based on '-'
     for i in range(0, len(connect_arr)):
         connect_dict[i] = connect_arr[i].split('-')
+
+        # checks for extra criteria to then append for later usage
         if connect_dict[i][1].find('max_link_capacity') != -1:
             connect_dict[i][1] = connect_dict[i][1].split(' ')
             connect_dict[i][1] = connect_dict[i][1][0]
+
+    # goes over each connection to make sure that there are no errors
     for i in range(0, len(connect_dict)):
         if connect_dict[i][0] == connect_dict[i][1]:
-            raise ValueError('both waypoints in connection are the same')
+            print('waypoints in connection are the same')
+            raise ValueError(f'{connect_dict[i][0]}-{connect_dict[i][1]}')
         if hub_names.count(connect_dict[i][0]) != 1:
-            raise ValueError('connection not delcared as a waypoint')
+            print('waypoint in connection not predefined')
+            raise ValueError(f'{connect_dict[i][0]}')
         if hub_names.count(connect_dict[i][1]) != 1:
-            raise ValueError('connection not delcared as a waypoint')
+            print('waypoint in connection not predefined')
+            raise ValueError(f'{connect_dict[i][1]}')
+        # checks to see if the connection has been used before
         if hub_dict.get(connect_dict[i][0]) is None:
             if hub_dict.get(connect_dict[i][1]) is None:
                 hub_dict[connect_dict[i][0]] = {connect_dict[i][1]}
             else:
                 try:
                     hub_dict[connect_dict[i][1]].remove(connect_dict[i][0])
-                    raise ValueError('same connection delcared multiple times')
+                    print('connection was already defined before')
+                    temp_error = f'{connect_dict[i][0]}-{connect_dict[i][1]}'
+                    raise ValueError(temp_error)
                 except KeyError:
                     hub_dict[connect_dict[i][0]].add(connect_dict[i][1])
         else:
             try:
-                hub_dict[connect_dict[i][0]].remove(connect_dict[i][0])
-                raise ValueError('same connection delcared multiple times')
+                hub_dict[connect_dict[i][0]].remove(connect_dict[i][1])
+                print('connection was already defined before')
+                raise ValueError(f'{connect_dict[i][0]}-{connect_dict[i][1]}')
             except KeyError:
                 hub_dict[connect_dict[i][0]].add(connect_dict[i][1])
 
@@ -179,36 +209,29 @@ def connection_handler(config_arr: list, hub_names: list) -> dict:
         for link in connect_dict:
             if connect_dict[link][0] == connection[0]:
                 if connect_dict[link][1] == connection[1]:
-                    connect_dict[link].append(connection[2])
+                    if connection[2] < 1:
+                        print('invalid max_link_capacity used')
+                        raise ValueError(f'max_link_capacity={connection[2]}')
+                    else:
+                        connect_dict[link].append(connection[2])
 
     return connect_dict
 
 
-def parser(config_file: TextIO) -> None:
-    text: str = ""
-    origin_arr: list = []
+def parser(origin_arr: list) -> dict:
     config_arr: list = []
     config_dict: dict = {}
     hub_dict: dict = {}
     hub_names: list = []
     connections_dict: dict = {}
 
-    try:
-        with open(config_file, "rt") as file:
-            text = file.read()
-    except FileNotFoundError:
-        print("Config file could not be found")
-    except PermissionError:
-        print("Config file permission do not allow access")
-
-    # turn string into list and remove comments
-    origin_arr = text.split('\n')
+    # remove comments and blank lines
     config_arr = [line for line in origin_arr if line.startswith('#') is False
                   and line != '']
 
     # parses the number of drones
     if config_arr[0].startswith('nb_drones:') is False:
-        raise ValueError("First line not nb_drones")
+        raise ValueError("nb_drones")
     else:
         config_dict.update(string_splitter(config_arr[0]))
 
@@ -223,10 +246,38 @@ def parser(config_file: TextIO) -> None:
     # instead of printing add to main dict
     for key in connections_dict:
         config_dict[key] = connections_dict[key]
-    print(config_dict)
+    return config_dict
 
 
-try:
-    parser("./maps/easy/01_linear_path.txt")
-except ValueError as alert:
-    print(alert)
+def parser_main(config_file: TextIO) -> dict:
+    text: str = ""
+    origin_arr: list = []
+    parse_result: dict = {}
+
+    # Read file, and then split the file from newlines into subscriptable list
+    try:
+        with open(config_file, "rt") as file:
+            text = file.read()
+    except FileNotFoundError:
+        print("Config file could not be found")
+    except PermissionError:
+        print("Config file permission do not allow access")
+    origin_arr = text.split('\n')
+
+    try:
+        parse_result = parser(origin_arr)
+        print(parse_result)
+    except ValueError as alert:
+        if f'{alert}' == 'nb_drones':
+            print(f'Error: {alert} not on first line\n    Found on line 1')
+        elif f'{alert}' == 'no start' or alert == 'no end':
+            print(f'Error: {alert}_hubs\n   Found in lines 1 to ',
+                  f'{len(origin_arr)}')
+        else:
+            for i in range(0, len(origin_arr)):
+                if origin_arr[i].find(f'{alert}') != -1:
+                    print(f"Error: {alert}\n    Found on line {i + 1}",
+                          f"of {config_file}")
+
+
+parser_main("./maps/easy/01_linear_path.txt")
