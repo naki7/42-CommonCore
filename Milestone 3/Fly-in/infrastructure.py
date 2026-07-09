@@ -1,5 +1,5 @@
 from parser import HubStruct, parser_main
-import random
+# import random
 
 
 class Hub:
@@ -40,7 +40,7 @@ def base_structure(config: dict) -> None:
     total_hubs: int = 0
     connections: list = []
     drones: list = []
-    completed_trips: list = []
+    # completed_trips: list = []
 
     for key in config['connections']:
         connections.append(Connection(key, config['connections'][key]))
@@ -66,26 +66,33 @@ def base_structure(config: dict) -> None:
     for drone in drones:
         print(f'{drone.id}-{drone.location.name}')
 
-    while len(completed_trips) != len(drones):
-        print_arr: list = []
-        for drone in drones:
-            if drone.location != hubs[total_hubs]:
-                connections_len: int = len(drone.location.connections)
-                rand_i: int = random.randrange(0, connections_len)
-                next_location: str = drone.location.connections[rand_i]
-                for hub in hubs:
-                    if hub.name == next_location:
-                        drone.location = hub
-                        break
-                print_arr.append(f'D{drone.id}-{next_location}')
-                if drone.location == hubs[total_hubs]:
-                    completed_trips.append(drone)
-        for i in range(0, len(print_arr)):
-            print(print_arr[i], end='')
-            if i != len(print_arr) - 1:
-                print(' ', end='')
-            else:
-                print('')
+    return {
+        'drones': drones,
+        'connections': connections,
+        'hubs': hubs,
+        'total_hubs': total_hubs
+        }
+
+    # while len(completed_trips) != len(drones):
+    #     print_arr: list = []
+    #     for drone in drones:
+    #         if drone.location != hubs[total_hubs]:
+    #             connections_len: int = len(drone.location.connections)
+    #             rand_i: int = random.randrange(0, connections_len)
+    #             next_location: str = drone.location.connections[rand_i]
+    #             for hub in hubs:
+    #                 if hub.name == next_location:
+    #                     drone.location = hub
+    #                     break
+    #             print_arr.append(f'D{drone.id}-{next_location}')
+    #             if drone.location == hubs[total_hubs]:
+    #                 completed_trips.append(drone)
+    #     for i in range(0, len(print_arr)):
+    #         print(print_arr[i], end='')
+    #         if i != len(print_arr) - 1:
+    #             print(' ', end='')
+    #         else:
+    #             print('')
 
 
-base_structure(parser_main("./maps/hard/01_linear_path01_maze_nightmare.txt"))
+base_structure(parser_main("./maps/easy/01_linear_path.txt"))

@@ -286,4 +286,4 @@ def parser_main(config_file: TextIO) -> dict:
                           f"of {config_file}")
 
 
-print(parser_main("./maps/hard/01_maze_nightmare.txt"))
+print(parser_main("./maps/easy/01_linear_path.txt"))
