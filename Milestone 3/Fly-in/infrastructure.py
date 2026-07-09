@@ -10,6 +10,7 @@ class Hub:
         self.color: str = config.color
         self.capacity: int = config.max_drones
         self.connections: list = self.get_links(connections)
+        self.linked_hubs: list = []
 
     def get_links(self, connections: list) -> list:
         links_list: list = []
@@ -19,6 +20,12 @@ class Hub:
             elif link.hubs[1] == self.name:
                 links_list.append(link.hubs[0])
         return links_list
+
+    def link_hubs(self, hubs: list) -> None:
+        for name in self.connections:
+            for hub in hubs:
+                if hub.name == name:
+                    self.linked_hubs.append(hub)
 
 
 class Connection:
@@ -35,7 +42,7 @@ class Drone:
         self.status: str = 'searching'
 
 
-def base_structure(config: dict) -> None:
+def base_structure(config: dict) -> dict:
     hubs: list = []
     total_hubs: int = 0
     connections: list = []
@@ -56,9 +63,10 @@ def base_structure(config: dict) -> None:
     total_hubs = len(hubs) - 1
 
     for hub in hubs:
+        hub.link_hubs(hubs)
         print(f'{hub.name} @ {hub.location[0]}, {hub.location[1]}\n',
               f'    type:{hub.type}, color:{hub.color}, limit:{hub.capacity}',
-              f'\n      {hub.connections}')
+              f'\n      {hub.connections}\n         {hub.linked_hubs}')
 
     for i in range(0, config['nb_drones']):
         drones.append(Drone(i + 1, hubs[0]))
@@ -95,4 +103,4 @@ def base_structure(config: dict) -> None:
     #             print('')
 
 
-base_structure(parser_main("./maps/easy/01_linear_path.txt"))
+# base_structure(parser_main("./maps/easy/01_linear_path.txt"))
