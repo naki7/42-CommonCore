@@ -1,4 +1,5 @@
-from parser import HubStruct, parser_main
+from parser import HubStruct
+# , parser_main
 # import random
 
 
@@ -103,4 +104,4 @@ def base_structure(config: dict) -> dict:
     #             print('')
 
 
-# base_structure(parser_main("./maps/easy/01_linear_path.txt"))
+# base_structure(parser_main("./maps/easy/test.txt"))
