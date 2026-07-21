@@ -31,13 +31,14 @@ def hub_name_checker(walked: list, current: HubStruct) -> bool:
 
 
 def check_neighbor_costs(current: list, len: int) -> list:
-    best_path: dict = {'cost': -1, 'hubs': []}
+    best_path: dict = {'cost': -1, 'hubs': [], 'priority': 0}
     result_hubs: list = []
     name_check: bool = False
 
     # add checks so that they dont just repeatedly back track
+    print(current[len - 1].name)
     for first_link in current[len - 1].linked_hubs:
-        path_attempt: dict = {'cost': -1, 'hubs': []}
+        path_attempt: dict = {'cost': -1, 'hubs': [], 'priority': 0}
         second_hub: dict = {'cost': -1, 'hub': None}
 
         if first_link.name == 'goal':
@@ -50,7 +51,7 @@ def check_neighbor_costs(current: list, len: int) -> list:
 
         if first_link.type == 'blocked':
             continue
-        elif first_link.type == 'restriced':
+        elif first_link.type == 'restricted':
             path_attempt['cost'] = 2
         else:
             path_attempt['cost'] = 1
@@ -58,8 +59,9 @@ def check_neighbor_costs(current: list, len: int) -> list:
 
         for second_link in first_link.linked_hubs:
             if second_link.name == 'goal':
-                path_attempt['cost'] -= 1
+                second_hub['cost'] = -1
                 path_attempt['hubs'].append(second_link)
+                path_attempt['priority'] = 1
                 break
 
             name_check = hub_name_checker(current, second_link)
@@ -77,13 +79,20 @@ def check_neighbor_costs(current: list, len: int) -> list:
                     second_hub['cost'] = 1
                     second_hub['hub'] = second_link
         if second_hub['cost'] != -1:
+            if current[len - 1].name == 'waypointA':
+                print(f' owowow = {second_hub['hub'].name}')
             path_attempt['cost'] += second_hub['cost']
             path_attempt['hubs'].append(second_hub['hub'])
         if path_attempt['cost'] != -1:
             if best_path['cost'] == -1:
                 best_path = path_setter(current, path_attempt)
-            elif best_path['cost'] > path_attempt['cost']:
-                best_path = path_setter(current, path_attempt)
+            elif best_path['cost'] >= path_attempt['cost']:
+                if path_attempt['priority'] == 0:
+                    if best_path['priority'] == 0:
+                        if best_path['cost'] > path_attempt['cost']:
+                            best_path = path_setter(current, path_attempt)
+                elif best_path['priority'] < path_attempt['priority']:
+                    best_path = path_setter(current, path_attempt)
 
     for hub in best_path['hubs']:
         print(f'~~~{hub.name}~~~>', end='')

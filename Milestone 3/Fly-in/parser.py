@@ -284,6 +284,3 @@ def parser_main(config_file: TextIO) -> dict:
                 if origin_arr[i].find(f'{alert}') != -1:
                     print(f"Error: {alert}\n    Found on line {i + 1}",
                           f"of {config_file}")
-
-
-print(parser_main("./maps/easy/test.txt"))
