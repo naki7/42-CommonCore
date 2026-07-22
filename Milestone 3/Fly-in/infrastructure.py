@@ -12,6 +12,8 @@ class Hub:
         self.capacity: int = config.max_drones
         self.connections: list = self.get_links(connections)
         self.linked_hubs: list = []
+        self.current_usage: int = 0
+        self.occupants: list = []
 
     def get_links(self, connections: list) -> list:
         links_list: list = []
@@ -27,6 +29,22 @@ class Hub:
             for hub in hubs:
                 if hub.name == name:
                     self.linked_hubs.append(hub)
+
+    def add_drone(self, drone: Drone) -> bool:
+        if self.current_usage < self.capacity:
+            self.current_usage += 1
+            self.occupants.append(drone)
+            return True
+        else:
+            return False
+
+    def remove_drone(self, drone: Drone) -> bool:
+        if self.current_usage > 0:
+            self.current_usage -= 1
+            self.occupants.pop(self.occupants.index(drone))
+            return True
+        else:
+            return False
 
 
 class Connection:

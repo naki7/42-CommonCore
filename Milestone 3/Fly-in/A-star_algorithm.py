@@ -22,7 +22,10 @@ def path_setter(walked: list, attempt: dict) -> dict:
     return attempt
 
 
-def hub_name_checker(walked: list, current: HubStruct) -> bool:
+def hub_checker(walked: list, current: HubStruct) -> bool:
+    if current.current_usage >= current.capacity:
+        return True
+
     for hub in walked:
         if hub.name == current.name:
             return True
@@ -45,7 +48,7 @@ def check_neighbor_costs(current: list, len: int) -> list:
             best_path = {'cost': 1, 'hubs': [first_link]}
             break
 
-        name_check = hub_name_checker(current, first_link)
+        name_check = hub_checker(current, first_link)
         if name_check is True:
             continue
 
@@ -64,7 +67,7 @@ def check_neighbor_costs(current: list, len: int) -> list:
                 path_attempt['priority'] = 1
                 break
 
-            name_check = hub_name_checker(current, second_link)
+            name_check = hub_checker(current, second_link)
             if name_check is True:
                 continue
 
