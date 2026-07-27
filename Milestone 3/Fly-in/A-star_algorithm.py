@@ -1,7 +1,28 @@
-from infrastructure import base_structure, HubStruct, Drone
+from infrastructure import base_structure, Drone, HubStruct, Connection
 from parser import parser_main
 from output import turn_print
 import time
+
+
+def get_connection(drone: Drone, current: HubStruct,
+                   next: HubStruct) -> Connection:
+    current_name: str = f'{current.name}-{next.name}'
+    next_name: str = f'{current.name}-{next.name}'
+
+    for link in current.connections:
+        if link.name == current_name or link.name == next_name:
+            link.add_drone(drone)
+            return link
+
+
+def copy_connection(current: HubStruct,
+                   next: HubStruct) -> Connection:
+    current_name: str = f'{current.name}-{next.name}'
+    next_name: str = f'{current.name}-{next.name}'
+
+    for link in current.connections:
+        if link.name == current_name or link.name == next_name:
+            return link
 
 
 def path_setter(walked: list, attempt: dict) -> dict:
@@ -14,12 +35,26 @@ def path_setter(walked: list, attempt: dict) -> dict:
 
     for hub in exclude_hubs:
         attempt['hubs'].pop(attempt['hubs'].index(hub))
-        if hub.type == 'restriced':
+        if hub.type == 'restricted':
             attempt['cost'] -= 2
         else:
             attempt['cost'] -= 1
     if attempt['cost'] == 0 or len(attempt['hubs']) == 0:
         attempt['cost'] = -1
+
+    # for hub in attempt["hubs"]:
+    #     if hub.type == 'restricted':
+    #         temp_link: Connection = copy_connection(hub)
+    #         if isinstance(hub, Connection):
+    #             print('instance')
+    #             if hub.current_usage >= hub.capacity:
+    #                 print('poppin it')
+    #                 attempt['hubs'].pop(attempt['hubs'].index(hub))
+    # elif attempt['hubs'][0].type == 'restricted':
+    #     print(f'{attempt["hubs"][0].current_usage} - {attempt["hubs"][0].capacity}')
+    #     if attempt['hubs'][0].current_usage >= attempt['hubs'][0].capacity:
+    #         attempt = {'cost': -1, 'hubs': [], 'priority': 0}
+    # print(attempt)
     return attempt
 
 
@@ -93,6 +128,7 @@ def check_neighbor_costs(current: list, len: int) -> list:
                             best_path = path_setter(current, path_attempt)
                 elif best_path['priority'] < path_attempt['priority']:
                     best_path = path_setter(current, path_attempt)
+        # print(best_path)
 
     # if best_path['cost'] < 1:
     #     print('waiting...')
@@ -101,18 +137,6 @@ def check_neighbor_costs(current: list, len: int) -> list:
         # print(f'~~~{hub.name}~~~>', end='')
         result_hubs.append(hub)
     # print('')
-
-    return result_hubs
-
-
-def finish_connection(current: list, first: HubStruct) -> list:
-    result_hubs: list = [first]
-    second_hub: dict = {'cost': -1, 'hub': None}
-    name_check: bool = False
-
-    for hub in first:
-        # more code ya know what i mean
-        continue
 
     return result_hubs
 
@@ -127,13 +151,13 @@ def path_finder(drones: list) -> None:
                 # for hub in drone.current_path:
                 #     print(f'-----{hub.name}->', end=' ')
                 # print('')
+
                 # finds the best next turns for the current drone
-                if drone.local_type == 'hub':
+                if drone.next_hub is None:
                     temp: list = check_neighbor_costs(drone.current_path,
                                                       drone.path_len)
-                elif drone.local_type == 'connection':
-                    temp: list = finish_connection(drone.current_path,
-                                                   drone.next_hub)
+                else:
+                    temp: list = [drone.next_hub]
                 temp_len: int = len(temp) + prev_len
 
                 # cleans out the second hub so turns print one at a time
@@ -149,9 +173,24 @@ def path_finder(drones: list) -> None:
                         if i < prev_len:
                             drone.current_path[i].remove_drone(drone)
                         else:
-                            drone.current_path.append(temp[i - prev_len])
-                            temp[i - prev_len].add_drone(drone)
-                            turn_print(drone.id, temp[i - prev_len].name)
+                            curr_i: int = i - prev_len
+                            if temp[curr_i].type != 'restricted':
+                                drone.current_path.append(temp[curr_i])
+                                temp[curr_i].add_drone(drone)
+                            else:
+                                if drone.next_hub is None:
+                                    prev_i: int = prev_len - 1
+                                    drone.next_hub = temp[curr_i]
+                                    connection: Connection = get_connection(
+                                        drone, drone.current_path[prev_i],
+                                        drone.next_hub
+                                    )
+                                    drone.current_path.append(connection)
+                                else:
+                                    drone.current_path.append(drone.next_hub)
+                                    drone.next_hub.add_drone(drone)
+                                    drone.next_hub = None
+                            turn_print(drone.id, drone.current_path[i].name)
                 drone.path_len = temp_len
                 time.sleep(0.1)
 

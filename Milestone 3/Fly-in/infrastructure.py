@@ -7,7 +7,6 @@ class Drone:
     def __init__(self, index: int, start: HubStruct):
         self.id: int = index
         self.location: HubStruct = start
-        self.local_type: str = 'hub'
         self.next_hub: HubStruct | None = None
         self.status: str = 'searching'
         self.current_path: list = [self.location]
@@ -69,7 +68,7 @@ class Connection:
     def __init__(self, index: int, config: list):
         self.id: int = index
         self.hubs: tuple = (config[0], config[1])
-        self.names: str = f'{config[0]}-{config[1]}'
+        self.name: str = f'{config[0]}-{config[1]}'
         self.capacity: int = config[2]
         self.current_usage: int = 0
         self.occupants: list = []
@@ -78,6 +77,7 @@ class Connection:
         if self.current_usage < self.capacity:
             self.current_usage += 1
             self.occupants.append(drone)
+            print(self.current_usage)
             return True
         else:
             return False
@@ -85,6 +85,7 @@ class Connection:
     def remove_drone(self, drone: Drone) -> bool:
         if self.current_usage > 0:
             self.current_usage -= 1
+            print(self.current_usage)
             self.occupants.pop(self.occupants.index(drone))
             return True
         else:
