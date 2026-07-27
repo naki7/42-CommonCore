@@ -3,6 +3,17 @@ from parser import HubStruct
 # import random
 
 
+class Drone:
+    def __init__(self, index: int, start: HubStruct):
+        self.id: int = index
+        self.location: HubStruct = start
+        self.local_type: str = 'hub'
+        self.next_hub: HubStruct | None = None
+        self.status: str = 'searching'
+        self.current_path: list = [self.location]
+        self.path_len: int = 1
+
+
 class Hub:
     def __init__(self, config: HubStruct, connections: list):
         self.name: str = config.name
@@ -10,7 +21,8 @@ class Hub:
         self.type: str = config.zone
         self.color: str = config.color
         self.capacity: int = config.max_drones
-        self.connections: list = self.get_links(connections)
+        self.connections: list = []
+        self.connect_names: list = self.get_links(connections)
         self.linked_hubs: list = []
         self.current_usage: int = 0
         self.occupants: list = []
@@ -20,18 +32,24 @@ class Hub:
         for link in connections:
             if link.hubs[0] == self.name:
                 links_list.append(link.hubs[1])
+                self.connections.append(link)
             elif link.hubs[1] == self.name:
                 links_list.append(link.hubs[0])
+                self.connections.append(link)
         return links_list
 
     def link_hubs(self, hubs: list) -> None:
-        for name in self.connections:
+        for name in self.connect_names:
             for hub in hubs:
                 if hub.name == name:
                     self.linked_hubs.append(hub)
 
     def add_drone(self, drone: Drone) -> bool:
-        if self.current_usage < self.capacity:
+        if self.name == 'start' or self.name == 'goal':
+            self.current_usage += 1
+            self.occupants.append(drone)
+            return True
+        elif self.current_usage < self.capacity:
             self.current_usage += 1
             self.occupants.append(drone)
             return True
@@ -51,14 +69,26 @@ class Connection:
     def __init__(self, index: int, config: list):
         self.id: int = index
         self.hubs: tuple = (config[0], config[1])
+        self.names: str = f'{config[0]}-{config[1]}'
         self.capacity: int = config[2]
+        self.current_usage: int = 0
+        self.occupants: list = []
 
+    def add_drone(self, drone: Drone) -> bool:
+        if self.current_usage < self.capacity:
+            self.current_usage += 1
+            self.occupants.append(drone)
+            return True
+        else:
+            return False
 
-class Drone:
-    def __init__(self, index: int, start: HubStruct):
-        self.id: int = index
-        self.location: HubStruct = start
-        self.status: str = 'searching'
+    def remove_drone(self, drone: Drone) -> bool:
+        if self.current_usage > 0:
+            self.current_usage -= 1
+            self.occupants.pop(self.occupants.index(drone))
+            return True
+        else:
+            return False
 
 
 def base_structure(config: dict) -> dict:
@@ -83,6 +113,7 @@ def base_structure(config: dict) -> dict:
 
     for i in range(0, config['nb_drones']):
         drones.append(Drone(i + 1, hubs[0]))
+        hubs[0].add_drone(drones[i])
 
     return {
         'drones': drones,

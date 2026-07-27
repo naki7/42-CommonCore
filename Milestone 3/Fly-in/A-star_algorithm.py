@@ -1,5 +1,6 @@
 from infrastructure import base_structure, HubStruct, Drone
 from parser import parser_main
+from output import turn_print
 import time
 
 
@@ -38,8 +39,6 @@ def check_neighbor_costs(current: list, len: int) -> list:
     result_hubs: list = []
     name_check: bool = False
 
-    # add checks so that they dont just repeatedly back track
-    print(current[len - 1].name)
     for first_link in current[len - 1].linked_hubs:
         path_attempt: dict = {'cost': -1, 'hubs': [], 'priority': 0}
         second_hub: dict = {'cost': -1, 'hub': None}
@@ -82,8 +81,6 @@ def check_neighbor_costs(current: list, len: int) -> list:
                     second_hub['cost'] = 1
                     second_hub['hub'] = second_link
         if second_hub['cost'] != -1:
-            if current[len - 1].name == 'waypointA':
-                print(f' owowow = {second_hub['hub'].name}')
             path_attempt['cost'] += second_hub['cost']
             path_attempt['hubs'].append(second_hub['hub'])
         if path_attempt['cost'] != -1:
@@ -97,37 +94,83 @@ def check_neighbor_costs(current: list, len: int) -> list:
                 elif best_path['priority'] < path_attempt['priority']:
                     best_path = path_setter(current, path_attempt)
 
+    # if best_path['cost'] < 1:
+    #     print('waiting...')
+    # else:
     for hub in best_path['hubs']:
-        print(f'~~~{hub.name}~~~>', end='')
+        # print(f'~~~{hub.name}~~~>', end='')
         result_hubs.append(hub)
-    print('')
+    # print('')
 
     return result_hubs
 
 
-def path_finder(drone: Drone) -> None:
-    current_path: list = [drone.location]
-    path_len: int = 1
+def finish_connection(current: list, first: HubStruct) -> list:
+    result_hubs: list = [first]
+    second_hub: dict = {'cost': -1, 'hub': None}
+    name_check: bool = False
 
-    while drone.status == 'searching':
-        for hub in current_path:
-            print(f'-----{hub.name}->', end=' ')
-        print('')
-        temp: list = check_neighbor_costs(current_path, path_len)
-        for hub in temp:
-            current_path.append(hub)
-        path_len = len(current_path)
-        time.sleep(0.1)
-        if current_path[path_len - 1].name == 'goal':
-            drone.status = 'plotted'
-    for hub in current_path:
-        print(f'-{hub.name}->', end=' ')
-    print('')
+    for hub in first:
+        # more code ya know what i mean
+        continue
+
+    return result_hubs
+
+
+def path_finder(drones: list) -> None:
+    searching_drones: int = len(drones)
+
+    while searching_drones > 0:
+        for drone in drones:
+            if drone.status == 'searching':
+                prev_len: int = drone.path_len
+                # for hub in drone.current_path:
+                #     print(f'-----{hub.name}->', end=' ')
+                # print('')
+                # finds the best next turns for the current drone
+                if drone.local_type == 'hub':
+                    temp: list = check_neighbor_costs(drone.current_path,
+                                                      drone.path_len)
+                elif drone.local_type == 'connection':
+                    temp: list = finish_connection(drone.current_path,
+                                                   drone.next_hub)
+                temp_len: int = len(temp) + prev_len
+
+                # cleans out the second hub so turns print one at a time
+                if temp_len - prev_len == 2:
+                    temp.pop(1)
+                    temp_len -= 1
+
+                # goes through the previous hubs visited by the drone to clear
+                # the space and make capacity available and also appends the
+                # next hub it moves to in current turn
+                if temp_len > prev_len:
+                    for i in range(0, temp_len):
+                        if i < prev_len:
+                            drone.current_path[i].remove_drone(drone)
+                        else:
+                            drone.current_path.append(temp[i - prev_len])
+                            temp[i - prev_len].add_drone(drone)
+                            turn_print(drone.id, temp[i - prev_len].name)
+                drone.path_len = temp_len
+                time.sleep(0.1)
+
+                # sets drone to no longer be looped
+                if drone.current_path[drone.path_len - 1].name == 'goal':
+                    drone.status = 'plotted'
+
+            # sets drone count to reduce and eventually ending loop
+            if drone.status == 'plotted':
+                # for hub in drone.current_path:
+                #     print(f'-{hub.name}->', end=' ')
+                # print('')
+                searching_drones -= 1
+                drone.status = 'goal'
 
 
 def main() -> None:
     sim: dict = base_structure(parser_main("./maps/easy/test.txt"))
-    path_finder(sim['drones'][0])
+    path_finder(sim['drones'])
 
 
 main()
