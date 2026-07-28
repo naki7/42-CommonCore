@@ -57,7 +57,12 @@ def compare_best_paths(best_path: dict, path_attempt: list,
                 elif best_path['priority'] < 1:
                     if best_path['cost'] > path_attempt['cost']:
                         best_path = path_setter(current, path_attempt)
+                elif best_path['priority'] != 1:
+                    best_path = path_setter(current, path_attempt)
             elif best_path['priority'] < path_attempt['priority']:
+                if best_path['priority'] != 1:
+                    best_path = path_setter(current, path_attempt)
+            elif path_attempt['priority'] == 1:
                 best_path = path_setter(current, path_attempt)
     return best_path
 
@@ -95,6 +100,8 @@ def check_neighbor_costs(current: list, len: int, drone: Drone) -> list:
             path_attempt['cost'] = 2
         else:
             path_attempt['cost'] = 1
+            if first_link.type == 'priority':
+                path_attempt['priority'] = 2
         path_attempt['hubs'].append(first_link)
 
         for second_link in first_link.linked_hubs:
@@ -116,6 +123,7 @@ def check_neighbor_costs(current: list, len: int, drone: Drone) -> list:
                 if second_hub['cost'] > 1:
                     second_hub['cost'] = 1
                     second_hub['hub'] = second_link
+
         if second_hub['cost'] != -1:
             path_attempt['cost'] += second_hub['cost']
             path_attempt['hubs'].append(second_hub['hub'])
