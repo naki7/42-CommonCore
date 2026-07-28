@@ -99,6 +99,8 @@ def base_structure(config: dict) -> dict:
 
     for key in config['connections']:
         connections.append(Connection(key, config['connections'][key]))
+    # for link in connections:
+    #     print(link.name)
 
     hubs.append(Hub(config['hubs']['start_hub'], connections))
     for key in config['hubs']:
@@ -109,6 +111,13 @@ def base_structure(config: dict) -> dict:
 
     for hub in hubs:
         hub.link_hubs(hubs)
+
+    # for hub in hubs:
+    #     print(f'-- {hub.name} --')
+    #     for link in hub.linked_hubs:
+    #         print(link.name)
+        # for links in hub.connections:
+        #     print(links.name)
 
     for i in range(0, config['nb_drones']):
         drones.append(Drone(i + 1, hubs[0]))
