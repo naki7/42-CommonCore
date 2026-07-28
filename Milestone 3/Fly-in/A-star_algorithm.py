@@ -4,19 +4,17 @@ from output import turn_print
 import time
 
 
-def get_connection(drone: Drone, current: HubStruct,
+def get_connection(current: HubStruct,
                    next: HubStruct) -> Connection:
     current_name: str = f'{current.name}-{next.name}'
     next_name: str = f'{current.name}-{next.name}'
 
     for link in current.connections:
         if link.name == current_name or link.name == next_name:
-            link.add_drone(drone)
             return link
 
 
-def copy_connection(current: HubStruct,
-                   next: HubStruct) -> Connection:
+def copy_connection(current: HubStruct, next: HubStruct) -> Connection:
     current_name: str = f'{current.name}-{next.name}'
     next_name: str = f'{current.name}-{next.name}'
 
@@ -69,9 +67,25 @@ def hub_checker(walked: list, current: HubStruct) -> bool:
     return False
 
 
-def check_neighbor_costs(current: list, len: int) -> list:
+def compare_best_paths(best_path: dict, path_attempt: list,
+                       current: list) -> dict:
+    if path_attempt['cost'] != -1:
+        if best_path['cost'] == -1:
+            best_path = path_setter(current, path_attempt)
+        elif best_path['cost'] >= path_attempt['cost']:
+            if path_attempt['priority'] == 0:
+                if best_path['priority'] == 0:
+                    if best_path['cost'] > path_attempt['cost']:
+                        best_path = path_setter(current, path_attempt)
+            elif best_path['priority'] < path_attempt['priority']:
+                best_path = path_setter(current, path_attempt)
+    return best_path
+
+
+def check_neighbor_costs(current: list, len: int, drone: Drone) -> list:
     best_path: dict = {'cost': -1, 'hubs': [], 'priority': 0}
     result_hubs: list = []
+    link_check: Connection = None
     name_check: bool = False
 
     for first_link in current[len - 1].linked_hubs:
@@ -84,11 +98,16 @@ def check_neighbor_costs(current: list, len: int) -> list:
 
         name_check = hub_checker(current, first_link)
         if name_check is True:
-            continue
+            if isinstance(current, Connection):
+                continue
 
         if first_link.type == 'blocked':
             continue
         elif first_link.type == 'restricted':
+            link_check = get_connection(current[len - 1], first_link)
+            if link_check is not None:
+                if link_check.current_usage >= link_check.capacity:
+                    continue
             path_attempt['cost'] = 2
         else:
             path_attempt['cost'] = 1
@@ -108,6 +127,10 @@ def check_neighbor_costs(current: list, len: int) -> list:
             if second_link.type == 'blocked':
                 continue
             elif second_link.type == 'restricted':
+                link_check = get_connection(current[len - 1], second_link)
+                if link_check is not None:
+                    if link_check.current_usage >= link_check.capacity:
+                        continue
                 if second_hub['cost'] > 2 or second_hub['cost'] < 0:
                     second_hub['cost'] = 2
                     second_hub['hub'] = second_link
@@ -118,16 +141,7 @@ def check_neighbor_costs(current: list, len: int) -> list:
         if second_hub['cost'] != -1:
             path_attempt['cost'] += second_hub['cost']
             path_attempt['hubs'].append(second_hub['hub'])
-        if path_attempt['cost'] != -1:
-            if best_path['cost'] == -1:
-                best_path = path_setter(current, path_attempt)
-            elif best_path['cost'] >= path_attempt['cost']:
-                if path_attempt['priority'] == 0:
-                    if best_path['priority'] == 0:
-                        if best_path['cost'] > path_attempt['cost']:
-                            best_path = path_setter(current, path_attempt)
-                elif best_path['priority'] < path_attempt['priority']:
-                    best_path = path_setter(current, path_attempt)
+        best_path = compare_best_paths(best_path, path_attempt, current)
         # print(best_path)
 
     # if best_path['cost'] < 1:
@@ -155,7 +169,8 @@ def path_finder(drones: list) -> None:
                 # finds the best next turns for the current drone
                 if drone.next_hub is None:
                     temp: list = check_neighbor_costs(drone.current_path,
-                                                      drone.path_len)
+                                                      drone.path_len,
+                                                      drone)
                 else:
                     temp: list = [drone.next_hub]
                 temp_len: int = len(temp) + prev_len
@@ -171,7 +186,9 @@ def path_finder(drones: list) -> None:
                 if temp_len > prev_len:
                     for i in range(0, temp_len):
                         if i < prev_len:
-                            drone.current_path[i].remove_drone(drone)
+                            if drone.current_path[i].occupants.count(
+                                                            drone) != 0:
+                                drone.current_path[i].remove_drone(drone)
                         else:
                             curr_i: int = i - prev_len
                             if temp[curr_i].type != 'restricted':
@@ -182,9 +199,10 @@ def path_finder(drones: list) -> None:
                                     prev_i: int = prev_len - 1
                                     drone.next_hub = temp[curr_i]
                                     connection: Connection = get_connection(
-                                        drone, drone.current_path[prev_i],
+                                        drone.current_path[prev_i],
                                         drone.next_hub
                                     )
+                                    connection.add_drone(drone)
                                     drone.current_path.append(connection)
                                 else:
                                     drone.current_path.append(drone.next_hub)

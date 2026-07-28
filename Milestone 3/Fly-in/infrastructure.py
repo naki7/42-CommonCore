@@ -77,7 +77,6 @@ class Connection:
         if self.current_usage < self.capacity:
             self.current_usage += 1
             self.occupants.append(drone)
-            print(self.current_usage)
             return True
         else:
             return False
@@ -85,7 +84,6 @@ class Connection:
     def remove_drone(self, drone: Drone) -> bool:
         if self.current_usage > 0:
             self.current_usage -= 1
-            print(self.current_usage)
             self.occupants.pop(self.occupants.index(drone))
             return True
         else:
