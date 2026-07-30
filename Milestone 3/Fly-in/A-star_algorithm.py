@@ -207,6 +207,9 @@ def path_finder(drones: list, state: sim_state) -> None:
         # update state class with the new locations
         state.update_state(turn_result)
 
+    if state.output_type != 'neither' and state.output_type != 'default':
+        state.produce_end()
+
 
 def main() -> None:
     output_type: str = 'default'

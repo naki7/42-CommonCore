@@ -16,7 +16,8 @@ class Drone:
 class Hub:
     def __init__(self, config: HubStruct, connections: list):
         self.name: str = config.name
-        self.location: tuple = (config.x, config.y)
+        self.x: int = config.x
+        self.y: int = config.y
         self.type: str = config.zone
         self.color: str = config.color
         self.capacity: int = config.max_drones
