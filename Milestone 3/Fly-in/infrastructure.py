@@ -1,6 +1,4 @@
 from parser import HubStruct
-# , parser_main
-# import random
 
 
 class Drone:
@@ -70,6 +68,8 @@ class Connection:
         self.id: int = index
         self.hubs: tuple = (config[0], config[1])
         self.name: str = f'{config[0]}-{config[1]}'
+        self.linked_hubs: list = []
+        self.init_hub: HubStruct = None
         self.capacity: int = config[2]
         self.current_usage: int = 0
         self.occupants: list = []
@@ -90,18 +90,22 @@ class Connection:
         else:
             return False
 
+    def find_hubs(self, hubs: list) -> None:
+        for hub in hubs:
+            if self.init_hub is None and hub.name == self.hubs[0]:
+                self.init_hub = hub
+            if hub.name == self.hubs[1]:
+                self.linked_hubs.append(hub)
+
 
 def base_structure(config: dict) -> dict:
     hubs: list = []
     total_hubs: int = 0
     connections: list = []
     drones: list = []
-    # completed_trips: list = []
 
     for key in config['connections']:
         connections.append(Connection(key, config['connections'][key]))
-    # for link in connections:
-    #     print(link.name)
 
     hubs.append(Hub(config['hubs']['start_hub'], connections))
     for key in config['hubs']:
@@ -113,12 +117,8 @@ def base_structure(config: dict) -> dict:
     for hub in hubs:
         hub.link_hubs(hubs)
 
-    # for hub in hubs:
-    #     print(f'-- {hub.name} --')
-    #     for link in hub.linked_hubs:
-    #         print(link.name)
-        # for links in hub.connections:
-        #     print(links.name)
+    for link in connections:
+        link.find_hubs(hubs)
 
     for i in range(0, config['nb_drones']):
         drones.append(Drone(i + 1, hubs[0]))

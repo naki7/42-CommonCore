@@ -193,6 +193,10 @@ def path_finder(drones: list, state: sim_state) -> None:
                             local_name: str = drone.current_path[i].name
                             turn_result[f'D{drone.id}'] = local_name
                 drone.path_len = temp_len
+                if state.output_type == 'pygame':
+                    time.sleep(0.4)
+                if state.output_type == 'both':
+                    time.sleep(0.4)
                 time.sleep(0.1)
 
                 # sets drone to no longer be looped
