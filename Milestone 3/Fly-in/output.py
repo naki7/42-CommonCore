@@ -22,29 +22,85 @@ class sim_state:
     # pygame setup
     def sim_init(self) -> None:
         pygame.init()
-        self.display = pygame.display.set_mode((1400, 1000))
+        self.display = pygame.display.set_mode((1800, 1000))
         pygame.display.set_caption('Fly-in')
         self.display.fill((0, 0, 0))
 
         for x in self.graph:
             for y in self.graph[x]:
                 pygame.draw.rect(self.display, (0, 0, 255),
-                                 [x * 200, y * 200, 150, 75],
+                                 [x * 180, y * 180, 100, 75],
                                  0)
 
         for link in self.connections:
             hub1: HubStruct = link.init_hub
             for hub2 in link.linked_hubs:
-                if hub1.x != hub2 and hub1.y != hub2.y:
-                    pygame.draw.line(self.display, (255, 0, 0),
-                                     [hub1.x * 200 + 100, hub1.y * 200 + 85],
-                                     [hub2.x * 200 + 100, hub2.y * 200 - 10],
-                                     3)
+                if hub1.x > hub2.x:
+                    if hub1.y == hub2.y:
+                        pygame.draw.line(self.display, (255, 0, 0),
+                                         [hub1.x * 180 + 50,
+                                         hub1.y * 180 + 37],
+                                         [hub2.x * 180 + 50,
+                                         hub2.y * 180 + 37],
+                                         3)
+                    elif hub1.y < hub2.y:
+                        pygame.draw.line(self.display, (255, 0, 0),
+                                         [hub1.x * 180 + 50,
+                                         hub1.y * 180 + 85],
+                                         [hub2.x * 180 - 50,
+                                         hub2.y * 180 - 10],
+                                         3)
+                    if hub1.y > hub2.y:
+                        pygame.draw.line(self.display, (255, 0, 0),
+                                         [hub1.x * 180 - 50,
+                                         hub1.y * 180 - 10],
+                                         [hub2.x * 180 + 50,
+                                         hub2.y * 180 + 85],
+                                         3)
+                elif hub1.x < hub2.x:
+                    if hub1.y == hub2.y:
+                        pygame.draw.line(self.display, (255, 0, 0),
+                                         [hub1.x * 180 + 50,
+                                         hub1.y * 180 + 37],
+                                         [hub2.x * 180 - 50,
+                                         hub2.y * 180 + 37],
+                                         3)
+                    elif hub1.y < hub2.y:
+                        pygame.draw.line(self.display, (255, 0, 0),
+                                         [hub1.x * 180 + 50,
+                                         hub1.y * 180 + 85],
+                                         [hub2.x * 180 - 50,
+                                         hub2.y * 180 - 10],
+                                         3)
+                    if hub1.y > hub2.y:
+                        pygame.draw.line(self.display, (255, 0, 0),
+                                         [hub1.x * 180 + 50,
+                                         hub1.y * 180 - 10],
+                                         [hub2.x * 180 - 50,
+                                         hub2.y * 180 + 85],
+                                         3)
                 else:
-                    pygame.draw.line(self.display, (255, 0, 0),
-                                     [hub1.x * 200 + 160, hub1.y * 200 + 40],
-                                     [hub2.x * 200 - 10, hub2.y * 200 + 40],
-                                     3)
+                    if hub1.y == hub2.y:
+                        pygame.draw.line(self.display, (255, 0, 0),
+                                         [hub1.x * 180 + 50,
+                                         hub1.y * 180 + 37],
+                                         [hub2.x * 180 + 50,
+                                         hub2.y * 180 + 37],
+                                         3)
+                    elif hub1.y < hub2.y:
+                        pygame.draw.line(self.display, (255, 0, 0),
+                                         [hub1.x * 180 + 50,
+                                         hub1.y * 180 + 85],
+                                         [hub2.x * 180 + 50,
+                                         hub2.y * 180 - 10],
+                                         3)
+                    if hub1.y > hub2.y:
+                        pygame.draw.line(self.display, (255, 0, 0),
+                                         [hub1.x * 180 + 50,
+                                         hub1.y * 180 - 10],
+                                         [hub2.x * 180 + 50,
+                                         hub2.y * 180 + 85],
+                                         3)
 
         pygame.display.update()
         self.copy_display = self.display.copy()
@@ -67,12 +123,12 @@ class sim_state:
                         end_x, end_y = hub.x, hub.y
                 mid_x, mid_y = (start_x + end_x) / 2, (start_y + end_y) / 2
                 pygame.draw.circle(self.display, (0, 255, 0),
-                                   [mid_x * 200 + 100, mid_y * 200 + 40],
+                                   [mid_x * 180 + 50, mid_y * 180 + 40],
                                    3.14)
             for hub in self.hubs:
                 if self.current_state[key] == hub.name:
                     pygame.draw.circle(self.display, (0, 255, 0),
-                                       [hub.x * 200 + 100, hub.y * 200 + 40],
+                                       [hub.x * 180 + 50, hub.y * 180 + 40],
                                        3.14)
         pygame.display.flip()
 

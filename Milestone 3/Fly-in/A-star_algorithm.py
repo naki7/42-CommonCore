@@ -24,11 +24,14 @@ def path_setter(walked: list, attempt: dict) -> dict:
                 exclude_hubs.append(hub)
 
     for hub in exclude_hubs:
-        attempt['hubs'].pop(attempt['hubs'].index(hub))
-        if hub.type == 'restricted':
-            attempt['cost'] -= 2
-        else:
-            attempt['cost'] -= 1
+        try:
+            attempt['hubs'].pop(attempt['hubs'].index(hub))
+            if hub.type == 'restricted':
+                attempt['cost'] -= 2
+            else:
+                attempt['cost'] -= 1
+        except ValueError:
+            continue
     if attempt['cost'] == 0 or len(attempt['hubs']) == 0:
         attempt['cost'] = -1
 
@@ -44,6 +47,44 @@ def hub_checker(walked: list, current: HubStruct) -> bool:
             return True
 
     return False
+
+
+def goal_chaser(current: HubStruct, walked: list) -> bool:
+    goal_found: int = False
+    bad_found: int = False
+    previous_hub: HubStruct = walked[len(walked) - 1]
+
+    while goal_found is False and bad_found is False:
+        if len(current.linked_hubs) == 2:
+            if current.linked_hubs[0].name == 'goal':
+                goal_found = True
+                break
+            elif current.linked_hubs[1].name == 'goal':
+                goal_found = True
+                break
+            for hub in walked:
+                if hub.name == current.linked_hubs[0]:
+                    if hub.name != previous_hub.name:
+                        bad_found = True
+                elif hub.name != current.linked_hubs[1]:
+                    if hub.name != previous_hub.name:
+                        bad_found = True
+                if bad_found is True:
+                    break
+            if goal_found is False and bad_found is False:
+                if current.linked_hubs[0].name == previous_hub.name:
+                    previous_hub = current
+                    current = current.linked_hubs[1]
+                else:
+                    previous_hub = current
+                    current = current.linked_hubs[0]
+        else:
+            bad_found = True
+
+    if goal_found is True:
+        return True
+    else:
+        return False
 
 
 def compare_best_paths(best_path: dict, path_attempt: list,
@@ -74,6 +115,7 @@ def check_neighbor_costs(current: list, len: int, drone: Drone) -> list:
     result_hubs: list = []
     link_check: Connection = None
     name_check: bool = False
+    chase_check: bool = False
 
     for first_link in current[len - 1].linked_hubs:
         path_attempt: dict = {'cost': -1, 'hubs': [], 'priority': 0}
@@ -91,6 +133,15 @@ def check_neighbor_costs(current: list, len: int, drone: Drone) -> list:
                 pass
             else:
                 continue
+        else:
+            chase_check = goal_chaser(first_link, current)
+            if chase_check is True:
+                if first_link.current_usage < first_link.capacity:
+                    best_path['cost'] = 0
+                    best_path['priority'] = 1
+                    best_path['hubs'].append(first_link)
+                    best_path['hubs'].append(first_link.linked_hubs[0])
+                    break
 
         name_check = hub_checker(current, first_link)
         if name_check is True:
