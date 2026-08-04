@@ -191,7 +191,7 @@ def connection_handler(config_arr: list, hub_names: list) -> dict:
                     temp_error = f'{connect_dict[i][0]}-{connect_dict[i][1]}'
                     raise ValueError(temp_error)
                 except KeyError:
-                    hub_dict[connect_dict[i][0]].add(connect_dict[i][1])
+                    hub_dict[connect_dict[i][0]] = {connect_dict[i][1]}
         else:
             try:
                 hub_dict[connect_dict[i][0]].remove(connect_dict[i][1])
@@ -266,8 +266,10 @@ def parser_main(config_file: TextIO) -> dict:
             text = file.read()
     except FileNotFoundError:
         print("Config file could not be found")
+        quit()
     except PermissionError:
         print("Config file permission do not allow access")
+        quit()
     origin_arr = text.split('\n')
 
     try:

@@ -29,7 +29,7 @@ class sim_state:
         for x in self.graph:
             for y in self.graph[x]:
                 pygame.draw.rect(self.display, (0, 0, 255),
-                                 [x * 250, y * 250, 200, 75],
+                                 [x * 200, y * 200, 150, 75],
                                  0)
 
         for link in self.connections:
@@ -37,13 +37,13 @@ class sim_state:
             for hub2 in link.linked_hubs:
                 if hub1.x != hub2 and hub1.y != hub2.y:
                     pygame.draw.line(self.display, (255, 0, 0),
-                                     [hub1.x * 250 + 100, hub1.y * 250 + 85],
-                                     [hub2.x * 250 + 100, hub2.y * 250 - 10],
+                                     [hub1.x * 200 + 100, hub1.y * 200 + 85],
+                                     [hub2.x * 200 + 100, hub2.y * 200 - 10],
                                      3)
                 else:
                     pygame.draw.line(self.display, (255, 0, 0),
-                                     [hub1.x * 250 + 210, hub1.y * 250 + 40],
-                                     [hub2.x * 250 - 10, hub2.y * 250 + 40],
+                                     [hub1.x * 200 + 160, hub1.y * 200 + 40],
+                                     [hub2.x * 200 - 10, hub2.y * 200 + 40],
                                      3)
 
         pygame.display.update()
@@ -55,10 +55,24 @@ class sim_state:
         for key in self.current_state:
             if key == 'turn':
                 continue
+            elif self.current_state[key].count('-') == 1:
+                start_x, start_y = 0, 0
+                end_x, end_y = 0, 0
+                start_hub: str = self.current_state[key].split('-')[0]
+                end_hub: str = self.current_state[key].split('-')[1]
+                for hub in self.hubs:
+                    if start_hub == hub.name:
+                        start_x, start_y = hub.x, hub.y
+                    elif end_hub == hub.name:
+                        end_x, end_y = hub.x, hub.y
+                mid_x, mid_y = (start_x + end_x) / 2, (start_y + end_y) / 2
+                pygame.draw.circle(self.display, (0, 255, 0),
+                                   [mid_x * 200 + 100, mid_y * 200 + 40],
+                                   3.14)
             for hub in self.hubs:
                 if self.current_state[key] == hub.name:
                     pygame.draw.circle(self.display, (0, 255, 0),
-                                       [hub.x * 250 + 100, hub.y * 250 + 40],
+                                       [hub.x * 200 + 100, hub.y * 200 + 40],
                                        3.14)
         pygame.display.flip()
 
@@ -71,7 +85,7 @@ class sim_state:
             if self.init_check is False:
                 init_turn[drone] = 'start'
         if self.init_check is False:
-            self.current_state.setup_dict
+            self.current_state = setup_dict
             self.init_check = True
         self.turn_saver.append(turn_print(init_turn, self.output_type))
         if self.output_type == 'pygame' or self.output_type == 'both':
@@ -100,7 +114,23 @@ class sim_state:
 def create_graph(hubs: list, links: list) -> dict:
     row_track: dict = {}
     graph_track: dict = {}
+    min_x: int = 1
+    min_y: int = 1
 
+    # normalize hub x & y co-ordinates to fit in window
+    for hub in hubs:
+        if hub.x < min_x:
+            min_x = hub.x
+        if hub.y < min_y:
+            min_y = hub.y
+    if min_x < 1:
+        for hub in hubs:
+            hub.x += (min_x * -1) + 0.1
+    if min_y < 1:
+        for hub in hubs:
+            hub.y += (min_y * -1) + 0.1
+
+    # setup dictionary structure for rows from x and columns from y
     for hub in hubs:
         try:
             row_track.get(hub.x)

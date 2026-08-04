@@ -1,6 +1,7 @@
 from infrastructure import base_structure, Drone, HubStruct, Connection
 from parser import parser_main
 from output import sim_state
+import pygame
 import time
 import sys
 
@@ -82,6 +83,15 @@ def check_neighbor_costs(current: list, len: int, drone: Drone) -> list:
             best_path = {'cost': 1, 'hubs': [first_link]}
             break
 
+        num_links: int = 0
+        for link in first_link.connections:
+            num_links += 1
+        if num_links < 2:
+            if first_link.linked_hubs[0].name == 'goal':
+                pass
+            else:
+                continue
+
         name_check = hub_checker(current, first_link)
         if name_check is True:
             if isinstance(current, Connection):
@@ -142,6 +152,18 @@ def path_finder(drones: list, state: sim_state) -> None:
     while searching_drones > 0:
         turn_result: dict = {}
         for drone in drones:
+
+            # check at start of loop to allow pygame to be closed
+            if state.output_type == 'both' or state.output_type == 'pygame':
+                for event in pygame.event.get():
+                    if event.type == pygame.QUIT:
+                        state.output_type = 'default'
+                        pygame.quit()
+                    if event.type == pygame.KEYDOWN:
+                        if event.key == pygame.K_ESCAPE:
+                            state.output_type = 'default'
+                            pygame.quit()
+
             if drone.status == 'searching':
                 prev_len: int = drone.path_len
 
@@ -219,13 +241,31 @@ def main() -> None:
     output_type: str = 'default'
     preplanned_outputs: list = ['terminal', 'pygame', 'neither', 'both']
 
-    sim_config: dict = base_structure(parser_main("./maps/easy/test.txt"))
+    if len(sys.argv) < 2:
+        print("Invalid command line input",
+              "Please try: python3 fly-in.py ./maps/easy/01_linear_path.txt",
+              sep='\n')
+        return
+    elif len(sys.argv) == 2 or len(sys.argv) == 3:
+        try:
+            test = open(sys.argv[1], 'r')
+        except FileNotFoundError as alert:
+            print(alert)
+            quit()
+        test.close()
 
-    if len(sys.argv) == 2:
-        if preplanned_outputs.count(f'{sys.argv[1]}') == 1:
-            output_type = sys.argv[1]
-        else:
-            print('Invalid output type; using default output')
+        if len(sys.argv) == 3:
+            if preplanned_outputs.count(f'{sys.argv[2]}') == 1:
+                output_type = sys.argv[2]
+            else:
+                print('Invalid output type; using default output')
+    else:
+        print("Invalid command line input",
+              "Please try: python3 fly-in.py ./maps/easy/01_linear_path.txt",
+              sep='\n')
+        quit()
+
+    sim_config: dict = base_structure(parser_main(sys.argv[1]))
 
     state_saver: sim_state = sim_state(sim_config, output_type)
     path_finder(sim_config['drones'], state_saver)
