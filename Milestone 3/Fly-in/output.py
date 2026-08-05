@@ -12,6 +12,7 @@ class sim_state:
         self.connections: list = config['connections']
         self.drones: list = [f'D{drone.id}' for drone in config['drones']]
         self.current_turn: int = 0
+        self.total_cost: int = 0
         self.output_type: str = output_type
         self.init_check: bool = False
         self.turn_saver: list = []
@@ -205,6 +206,7 @@ class sim_state:
         self.current_state['turn'] = self.current_turn
 
         for drone in turn_result:
+            self.total_cost += 1
             self.current_state[drone] = turn_result[drone]
 
         self.turn_saver.append(turn_print(turn_result, self.output_type,
@@ -213,8 +215,17 @@ class sim_state:
             self.sim_updater()
 
     def produce_end(self) -> None:
-        for turn in self.turn_saver:
-            print(turn)
+        num_drones: int = len(self.drones)
+
+        if self.output_type == 'pygame' or self.output_type == 'both':
+            for turn in self.turn_saver:
+                print(turn)
+        print('-' * 16)
+        print(f"Turns to complete full sim: {self.current_turn}")
+        print("Average number of drones moved per turn:",
+              f"{self.total_cost / self.current_turn}")
+        print(f"Average turns used per drone: {self.total_cost / num_drones}")
+        print(f"Sum of turns taken by drones: {self.total_cost}")
 
 
 def create_graph(hubs: list, links: list) -> dict:
