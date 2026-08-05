@@ -38,45 +38,45 @@ class sim_state:
                 if hub1.x > hub2.x:
                     if hub1.y == hub2.y:
                         pygame.draw.line(self.display, (255, 0, 0),
-                                         [hub1.x * 180 + 50,
+                                         [hub1.x * 180 - 10,
                                          hub1.y * 180 + 37],
-                                         [hub2.x * 180 + 50,
+                                         [hub2.x * 180 + 110,
                                          hub2.y * 180 + 37],
                                          3)
                     elif hub1.y < hub2.y:
                         pygame.draw.line(self.display, (255, 0, 0),
-                                         [hub1.x * 180 + 50,
+                                         [hub1.x * 180 - 110,
                                          hub1.y * 180 + 85],
-                                         [hub2.x * 180 - 50,
+                                         [hub2.x * 180 + 10,
                                          hub2.y * 180 - 10],
                                          3)
                     if hub1.y > hub2.y:
                         pygame.draw.line(self.display, (255, 0, 0),
-                                         [hub1.x * 180 - 50,
+                                         [hub1.x * 180 - 110,
                                          hub1.y * 180 - 10],
-                                         [hub2.x * 180 + 50,
+                                         [hub2.x * 180 + 10,
                                          hub2.y * 180 + 85],
                                          3)
                 elif hub1.x < hub2.x:
                     if hub1.y == hub2.y:
                         pygame.draw.line(self.display, (255, 0, 0),
-                                         [hub1.x * 180 + 50,
+                                         [hub1.x * 180 + 110,
                                          hub1.y * 180 + 37],
-                                         [hub2.x * 180 - 50,
+                                         [hub2.x * 180 - 10,
                                          hub2.y * 180 + 37],
                                          3)
                     elif hub1.y < hub2.y:
                         pygame.draw.line(self.display, (255, 0, 0),
-                                         [hub1.x * 180 + 50,
+                                         [hub1.x * 180 + 110,
                                          hub1.y * 180 + 85],
-                                         [hub2.x * 180 - 50,
+                                         [hub2.x * 180 - 10,
                                          hub2.y * 180 - 10],
                                          3)
                     if hub1.y > hub2.y:
                         pygame.draw.line(self.display, (255, 0, 0),
-                                         [hub1.x * 180 + 50,
+                                         [hub1.x * 180 + 110,
                                          hub1.y * 180 - 10],
-                                         [hub2.x * 180 - 50,
+                                         [hub2.x * 180 - 10,
                                          hub2.y * 180 + 85],
                                          3)
                 else:
