@@ -2,6 +2,7 @@ import contextlib
 with contextlib.redirect_stdout(None):
     import pygame
 from infrastructure import HubStruct
+from rich import print as rprint
 
 
 class sim_state:
@@ -190,7 +191,8 @@ class sim_state:
         if self.init_check is False:
             self.current_state = setup_dict
             self.init_check = True
-        self.turn_saver.append(turn_print(init_turn, self.output_type))
+        self.turn_saver.append(turn_print(init_turn, self.output_type,
+                                          self.hubs))
         if self.output_type == 'pygame' or self.output_type == 'both':
             self.graph = create_graph(self.hubs, self.connections)
             self.sim_init()
@@ -205,7 +207,8 @@ class sim_state:
         for drone in turn_result:
             self.current_state[drone] = turn_result[drone]
 
-        self.turn_saver.append(turn_print(turn_result, self.output_type))
+        self.turn_saver.append(turn_print(turn_result, self.output_type,
+                                          self.hubs))
         if self.output_type == 'pygame' or self.output_type == 'both':
             self.sim_updater()
 
@@ -253,17 +256,24 @@ def create_graph(hubs: list, links: list) -> dict:
     return graph_track
 
 
-def turn_print(turn_result: dict, out_type: str) -> str:
+def turn_print(turn_result: dict, out_type: str, hubs: list) -> str:
     num_moves: int = len(turn_result)
     turn_str: str = ''
+    colour: str = ''
 
     for movement in turn_result:
-        turn_str += f'{movement}-{turn_result[movement]}'
+        colour = ''
+        for hub in hubs:
+            if hub.name == turn_result[movement]:
+                colour = hub.color
+        if colour == '':
+            colour = 'purple'
+        turn_str += f'{movement}-[{colour}]{turn_result[movement]}[/{colour}]'
         num_moves -= 1
         if num_moves != 0:
             turn_str += ' '
 
     if out_type == 'default' or out_type == 'neither':
-        print(turn_str)
+        rprint(turn_str)
     else:
         return turn_str
