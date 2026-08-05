@@ -30,35 +30,45 @@ class sim_state:
 
         for x in self.graph:
             for y in self.graph[x]:
-                pygame.draw.rect(self.display, (0, 0, 255),
+                config_color: str = self.graph[x][y].color
+                if config_color == 'green':
+                    hub_color = pygame.Color('green4')
+                elif config_color == 'blue':
+                    hub_color = pygame.Color('dodgerblue3')
+                elif config_color == 'red':
+                    hub_color = pygame.Color('red4')
+                else:
+                    hub_color = pygame.Color(self.graph[x][y].color)
+                pygame.draw.rect(self.display, (hub_color),
                                  [x * 180, y * 180, 100, 75],
                                  0)
                 text = font.render(self.graph[x][y].name, True,
-                                   (255, 255, 255))
+                                   (0, 0, 0))
                 text_rect = text.get_rect()
                 text_rect.center = (x * 180 + 50, y * 180 + 10)
                 self.display.blit(text, text_rect)
 
+        link_color = pygame.Color('snow3')
         for link in self.connections:
             hub1: HubStruct = link.init_hub
             for hub2 in link.linked_hubs:
                 if hub1.x > hub2.x:
                     if hub1.y == hub2.y:
-                        pygame.draw.line(self.display, (255, 0, 0),
+                        pygame.draw.line(self.display, (link_color),
                                          [hub1.x * 180 - 10,
                                          hub1.y * 180 + 37],
                                          [hub2.x * 180 + 110,
                                          hub2.y * 180 + 37],
                                          3)
                     elif hub1.y < hub2.y:
-                        pygame.draw.line(self.display, (255, 0, 0),
+                        pygame.draw.line(self.display, (link_color),
                                          [hub1.x * 180 - 110,
                                          hub1.y * 180 + 85],
                                          [hub2.x * 180 + 10,
                                          hub2.y * 180 - 10],
                                          3)
                     if hub1.y > hub2.y:
-                        pygame.draw.line(self.display, (255, 0, 0),
+                        pygame.draw.line(self.display, (link_color),
                                          [hub1.x * 180 - 110,
                                          hub1.y * 180 - 10],
                                          [hub2.x * 180 + 10,
@@ -66,21 +76,21 @@ class sim_state:
                                          3)
                 elif hub1.x < hub2.x:
                     if hub1.y == hub2.y:
-                        pygame.draw.line(self.display, (255, 0, 0),
+                        pygame.draw.line(self.display, (link_color),
                                          [hub1.x * 180 + 110,
                                          hub1.y * 180 + 37],
                                          [hub2.x * 180 - 10,
                                          hub2.y * 180 + 37],
                                          3)
                     elif hub1.y < hub2.y:
-                        pygame.draw.line(self.display, (255, 0, 0),
+                        pygame.draw.line(self.display, (link_color),
                                          [hub1.x * 180 + 110,
                                          hub1.y * 180 + 85],
                                          [hub2.x * 180 - 10,
                                          hub2.y * 180 - 10],
                                          3)
                     if hub1.y > hub2.y:
-                        pygame.draw.line(self.display, (255, 0, 0),
+                        pygame.draw.line(self.display, (link_color),
                                          [hub1.x * 180 + 110,
                                          hub1.y * 180 - 10],
                                          [hub2.x * 180 - 10,
@@ -88,21 +98,21 @@ class sim_state:
                                          3)
                 else:
                     if hub1.y == hub2.y:
-                        pygame.draw.line(self.display, (255, 0, 0),
+                        pygame.draw.line(self.display, (link_color),
                                          [hub1.x * 180 + 50,
                                          hub1.y * 180 + 37],
                                          [hub2.x * 180 + 50,
                                          hub2.y * 180 + 37],
                                          3)
                     elif hub1.y < hub2.y:
-                        pygame.draw.line(self.display, (255, 0, 0),
+                        pygame.draw.line(self.display, (link_color),
                                          [hub1.x * 180 + 50,
                                          hub1.y * 180 + 85],
                                          [hub2.x * 180 + 50,
                                          hub2.y * 180 - 10],
                                          3)
                     if hub1.y > hub2.y:
-                        pygame.draw.line(self.display, (255, 0, 0),
+                        pygame.draw.line(self.display, (link_color),
                                          [hub1.x * 180 + 50,
                                          hub1.y * 180 - 10],
                                          [hub2.x * 180 + 50,
@@ -116,6 +126,7 @@ class sim_state:
         self.display.blit(self.copy_display, (0, 0))
         pygame.display.update()
         font = pygame.font.Font(None, 15)
+        drone_color = pygame.Color('springgreen')
         offset: dict = {}
         for key in self.current_state:
             if key == 'turn':
@@ -136,9 +147,9 @@ class sim_state:
                     offset.get(self.current_state[key])
                     offset[self.current_state[key]] += 10
                 except KeyError:
-                    offset[self.current_state[key]] = 40
+                    offset[self.current_state[key]] = 50
                 text = font.render(key, True,
-                                   (0, 255, 0))
+                                   (drone_color))
                 text_rect = text.get_rect()
                 text_rect.center = (mid_x * 180 + 60,
                                     mid_y * 180 + offset[
@@ -146,8 +157,8 @@ class sim_state:
 
                 self.display.blit(text, text_rect)
 
-                pygame.draw.circle(self.display, (0, 255, 0),
-                                   [mid_x * 180 + 50, mid_y * 180 + 40],
+                pygame.draw.circle(self.display, (drone_color),
+                                   [mid_x * 180 + 50, mid_y * 180 + 50],
                                    3.14)
             for hub in self.hubs:
                 if self.current_state[key] == hub.name:
@@ -157,13 +168,13 @@ class sim_state:
                     except KeyError:
                         offset[hub.name] = 40
                     text = font.render(key, True,
-                                       (0, 255, 0))
+                                       (drone_color))
                     text_rect = text.get_rect()
                     text_rect.center = (hub.x * 180 + 60,
                                         hub.y * 180 + offset[hub.name])
                     self.display.blit(text, text_rect)
 
-                    pygame.draw.circle(self.display, (0, 255, 0),
+                    pygame.draw.circle(self.display, (drone_color),
                                        [hub.x * 180 + 50, hub.y * 180 + 40],
                                        3.14)
         pygame.display.flip()
