@@ -26,11 +26,18 @@ class sim_state:
         pygame.display.set_caption('Fly-in')
         self.display.fill((0, 0, 0))
 
+        font = pygame.font.Font(None, 20)
+
         for x in self.graph:
             for y in self.graph[x]:
                 pygame.draw.rect(self.display, (0, 0, 255),
                                  [x * 180, y * 180, 100, 75],
                                  0)
+                text = font.render(self.graph[x][y].name, True,
+                                   (255, 255, 255))
+                text_rect = text.get_rect()
+                text_rect.center = (x * 180 + 50, y * 180 + 10)
+                self.display.blit(text, text_rect)
 
         for link in self.connections:
             hub1: HubStruct = link.init_hub
@@ -108,6 +115,8 @@ class sim_state:
     def sim_updater(self) -> None:
         self.display.blit(self.copy_display, (0, 0))
         pygame.display.update()
+        font = pygame.font.Font(None, 15)
+        offset: dict = {}
         for key in self.current_state:
             if key == 'turn':
                 continue
@@ -122,11 +131,38 @@ class sim_state:
                     elif end_hub == hub.name:
                         end_x, end_y = hub.x, hub.y
                 mid_x, mid_y = (start_x + end_x) / 2, (start_y + end_y) / 2
+
+                try:
+                    offset.get(self.current_state[key])
+                    offset[self.current_state[key]] += 10
+                except KeyError:
+                    offset[self.current_state[key]] = 40
+                text = font.render(key, True,
+                                   (0, 255, 0))
+                text_rect = text.get_rect()
+                text_rect.center = (mid_x * 180 + 60,
+                                    mid_y * 180 + offset[
+                                        self.current_state[key]])
+
+                self.display.blit(text, text_rect)
+
                 pygame.draw.circle(self.display, (0, 255, 0),
                                    [mid_x * 180 + 50, mid_y * 180 + 40],
                                    3.14)
             for hub in self.hubs:
                 if self.current_state[key] == hub.name:
+                    try:
+                        offset.get(hub.name)
+                        offset[hub.name] += 10
+                    except KeyError:
+                        offset[hub.name] = 40
+                    text = font.render(key, True,
+                                       (0, 255, 0))
+                    text_rect = text.get_rect()
+                    text_rect.center = (hub.x * 180 + 60,
+                                        hub.y * 180 + offset[hub.name])
+                    self.display.blit(text, text_rect)
+
                     pygame.draw.circle(self.display, (0, 255, 0),
                                        [hub.x * 180 + 50, hub.y * 180 + 40],
                                        3.14)
