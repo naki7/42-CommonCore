@@ -8,10 +8,10 @@ import sys
 
 def get_connect(current: HubStruct, next: HubStruct) -> Connection:
     current_name: str = f'{current.name}-{next.name}'
-    next_name: str = f'{current.name}-{next.name}'
+    reverse_name: str = f'{next.name}-{current.name}'
 
     for link in current.connections:
-        if link.name == current_name or link.name == next_name:
+        if link.name == current_name or link.name == reverse_name:
             return link
 
 
@@ -110,14 +110,14 @@ def compare_best_paths(best_path: dict, path_attempt: list,
     return best_path
 
 
-def check_neighbor_costs(current: list, len: int, drone: Drone) -> list:
+def check_neighbor_costs(current: list, path_len: int, drone: Drone) -> list:
     best_path: dict = {'cost': -1, 'hubs': [], 'priority': 0}
     result_hubs: list = []
     link_check: Connection = None
     name_check: bool = False
     chase_check: bool = False
 
-    for first_link in current[len - 1].linked_hubs:
+    for first_link in current[path_len - 1].linked_hubs:
         path_attempt: dict = {'cost': -1, 'hubs': [], 'priority': 0}
         second_hub: dict = {'cost': -1, 'hub': None}
 
@@ -155,7 +155,7 @@ def check_neighbor_costs(current: list, len: int, drone: Drone) -> list:
         if first_link.type == 'blocked':
             continue
         elif first_link.type == 'restricted':
-            link_check = get_connect(current[len - 1], first_link)
+            link_check = get_connect(current[path_len - 1], first_link)
             if link_check is not None:
                 if link_check.current_usage >= link_check.capacity:
                     continue
@@ -181,10 +181,17 @@ def check_neighbor_costs(current: list, len: int, drone: Drone) -> list:
                 continue
             elif second_link.type == 'restricted':
                 continue
-            else:
-                if second_hub['cost'] > 1:
-                    second_hub['cost'] = 1
-                    second_hub['hub'] = second_link
+
+            # avoid stepping into an immediate dead-end branch
+            onward_hubs = [hub for hub in second_link.linked_hubs
+                           if hub.name != first_link.name]
+            if len(onward_hubs) == 0:
+                path_attempt = {'cost': -1, 'hubs': [], 'priority': 0}
+                continue
+
+            if second_hub['cost'] > 1:
+                second_hub['cost'] = 1
+                second_hub['hub'] = second_link
 
         if second_hub['cost'] != -1:
             path_attempt['cost'] += second_hub['cost']
