@@ -30,9 +30,14 @@ class sim_state:
 
         font = pygame.font.Font(None, 20)
 
-        for x in self.graph:
-            for y in self.graph[x]:
-                config_color: str = self.graph[x][y].color
+        for i in self.graph:
+            for j in self.graph[i]:
+                x: int = i
+                y: int = j
+                if i > 9:
+                    y += x - 9.5
+                    x = 9
+                config_color: str = self.graph[i][j].color
                 if config_color == 'green':
                     hub_color = pygame.Color('green4')
                 elif config_color == 'blue':
@@ -40,11 +45,11 @@ class sim_state:
                 elif config_color == 'red':
                     hub_color = pygame.Color('red4')
                 else:
-                    hub_color = pygame.Color(self.graph[x][y].color)
+                    hub_color = pygame.Color(self.graph[i][j].color)
                 pygame.draw.rect(self.display, (hub_color),
                                  [x * 180, y * 180, 100, 75],
                                  0)
-                text = font.render(self.graph[x][y].name, True,
+                text = font.render(self.graph[i][j].name, True,
                                    (0, 0, 0))
                 text_rect = text.get_rect()
                 text_rect.center = (x * 180 + 50, y * 180 + 10)
@@ -54,71 +59,89 @@ class sim_state:
         for link in self.connections:
             hub1: HubStruct = link.init_hub
             for hub2 in link.linked_hubs:
+                x1: int = hub1.x
+                y1: int = hub1.y
+                x2: int = hub2.x
+                y2: int = hub2.y
+                if hub1.x > 9:
+                    if hub2.x <= 9:
+                        y1 += x1 - 9
+                        x1 = 9
+                    else:
+                        y1 += x1 - 9.25
+                        x1 = 8.625
+                if hub2.x > 9:
+                    if x1 == 8.625:
+                        y2 += x2 - 9.75
+                        x2 = 9.29
+                    else:
+                        y2 += x2 - 9.5
+                        x2 = 9
                 if hub1.x > hub2.x:
                     if hub1.y == hub2.y:
                         pygame.draw.line(self.display, (link_color),
-                                         [hub1.x * 180 - 10,
-                                         hub1.y * 180 + 37],
-                                         [hub2.x * 180 + 110,
-                                         hub2.y * 180 + 37],
+                                         [x1 * 180 - 10,
+                                         y1 * 180 + 37],
+                                         [x2 * 180 + 110,
+                                         y2 * 180 + 37],
                                          3)
                     elif hub1.y < hub2.y:
                         pygame.draw.line(self.display, (link_color),
-                                         [hub1.x * 180 - 110,
-                                         hub1.y * 180 + 85],
-                                         [hub2.x * 180 + 10,
-                                         hub2.y * 180 - 10],
+                                         [x1 * 180 + 10,
+                                         y1 * 180 + 85],
+                                         [x2 * 180 + 110,
+                                         y2 * 180 - 10],
                                          3)
                     if hub1.y > hub2.y:
                         pygame.draw.line(self.display, (link_color),
-                                         [hub1.x * 180 - 110,
-                                         hub1.y * 180 - 10],
-                                         [hub2.x * 180 + 10,
-                                         hub2.y * 180 + 85],
+                                         [x1 * 180 - 10,
+                                         y1 * 180 - 10],
+                                         [x2 * 180 + 110,
+                                         y2 * 180 + 85],
                                          3)
                 elif hub1.x < hub2.x:
                     if hub1.y == hub2.y:
                         pygame.draw.line(self.display, (link_color),
-                                         [hub1.x * 180 + 110,
-                                         hub1.y * 180 + 37],
-                                         [hub2.x * 180 - 10,
-                                         hub2.y * 180 + 37],
+                                         [x1 * 180 + 110,
+                                         y1 * 180 + 37],
+                                         [x2 * 180 - 10,
+                                         y2 * 180 + 37],
                                          3)
                     elif hub1.y < hub2.y:
                         pygame.draw.line(self.display, (link_color),
-                                         [hub1.x * 180 + 110,
-                                         hub1.y * 180 + 85],
-                                         [hub2.x * 180 - 10,
-                                         hub2.y * 180 - 10],
+                                         [x1 * 180 + 110,
+                                         y1 * 180 + 85],
+                                         [x2 * 180 - 10,
+                                         y2 * 180 - 10],
                                          3)
                     if hub1.y > hub2.y:
                         pygame.draw.line(self.display, (link_color),
-                                         [hub1.x * 180 + 110,
-                                         hub1.y * 180 - 10],
-                                         [hub2.x * 180 - 10,
-                                         hub2.y * 180 + 85],
+                                         [x1 * 180 + 110,
+                                         y1 * 180 - 10],
+                                         [x2 * 180 - 10,
+                                         y2 * 180 + 85],
                                          3)
                 else:
                     if hub1.y == hub2.y:
                         pygame.draw.line(self.display, (link_color),
-                                         [hub1.x * 180 + 50,
-                                         hub1.y * 180 + 37],
-                                         [hub2.x * 180 + 50,
-                                         hub2.y * 180 + 37],
+                                         [x1 * 180 + 50,
+                                         y1 * 180 + 37],
+                                         [x2 * 180 + 50,
+                                         y2 * 180 + 37],
                                          3)
                     elif hub1.y < hub2.y:
                         pygame.draw.line(self.display, (link_color),
-                                         [hub1.x * 180 + 50,
-                                         hub1.y * 180 + 85],
-                                         [hub2.x * 180 + 50,
-                                         hub2.y * 180 - 10],
+                                         [x1 * 180 + 50,
+                                         y1 * 180 + 85],
+                                         [x2 * 180 + 50,
+                                         y2 * 180 - 10],
                                          3)
                     if hub1.y > hub2.y:
                         pygame.draw.line(self.display, (link_color),
-                                         [hub1.x * 180 + 50,
-                                         hub1.y * 180 - 10],
-                                         [hub2.x * 180 + 50,
-                                         hub2.y * 180 + 85],
+                                         [x1 * 180 + 50,
+                                         y1 * 180 - 10],
+                                         [x2 * 180 + 50,
+                                         y2 * 180 + 85],
                                          3)
 
         pygame.display.update()
@@ -144,6 +167,9 @@ class sim_state:
                     elif end_hub == hub.name:
                         end_x, end_y = hub.x, hub.y
                 mid_x, mid_y = (start_x + end_x) / 2, (start_y + end_y) / 2
+                if mid_x > 9:
+                    mid_y += mid_x - 9.5
+                    mid_x = 9
 
                 try:
                     offset.get(self.current_state[key])
@@ -169,15 +195,20 @@ class sim_state:
                         offset[hub.name] += 10
                     except KeyError:
                         offset[hub.name] = 40
+                    x: int = hub.x
+                    y: int = hub.y
+                    if x > 9:
+                        y += x - 9.5
+                        x = 9
                     text = font.render(key, True,
                                        (drone_color))
                     text_rect = text.get_rect()
-                    text_rect.center = (hub.x * 180 + 60,
-                                        hub.y * 180 + offset[hub.name])
+                    text_rect.center = (x * 180 + 60,
+                                        y * 180 + offset[hub.name])
                     self.display.blit(text, text_rect)
 
                     pygame.draw.circle(self.display, (drone_color),
-                                       [hub.x * 180 + 50, hub.y * 180 + 40],
+                                       [x * 180 + 50, y * 180 + 40],
                                        3.14)
         pygame.display.flip()
 
