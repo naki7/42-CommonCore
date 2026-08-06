@@ -186,7 +186,11 @@ def check_neighbor_costs(current: list, path_len: int, drone: Drone) -> list:
             onward_hubs = [hub for hub in second_link.linked_hubs
                            if hub.name != first_link.name]
             if len(onward_hubs) == 0:
-                path_attempt = {'cost': -1, 'hubs': [], 'priority': 0}
+                onward_hubs = [hub for hub in first_link.linked_hubs
+                               if hub.name != current[path_len - 1].name and
+                               hub.name != second_link.name]
+                if len(onward_hubs) == 0:
+                    path_attempt = {'cost': -1, 'hubs': [], 'priority': 0}
                 continue
 
             if second_hub['cost'] > 1:
