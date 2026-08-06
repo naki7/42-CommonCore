@@ -192,6 +192,15 @@ def check_neighbor_costs(current: list, path_len: int, drone: Drone) -> list:
                 if len(onward_hubs) == 0:
                     path_attempt = {'cost': -1, 'hubs': [], 'priority': 0}
                 continue
+            else:
+                chase_check = goal_chaser(second_link, current)
+                if chase_check is True:
+                    if second_link.current_usage < second_link.capacity:
+                        best_path['cost'] = 0
+                        best_path['priority'] = 1
+                        best_path['hubs'].append(second_link)
+                        best_path['hubs'].append(second_link.linked_hubs[0])
+                        break
 
             if second_hub['cost'] > 1:
                 second_hub['cost'] = 1
