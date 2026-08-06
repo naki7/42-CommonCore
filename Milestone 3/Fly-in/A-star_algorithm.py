@@ -87,8 +87,37 @@ def goal_chaser(current: HubStruct, walked: list) -> bool:
         return False
 
 
+# def start_search(current: HubStruct, walked: list) -> bool:
+#     for hub in current.linked_hubs:
+#         if hub.name == current.name:
+#             continue
+#         for prev in walked:
+#             if prev.name == current.name:
+#                 continue
+#         if hub.name == 'goal':
+#             return False
+#         if hub.name == 'start':
+#             return True
+#     return False
+
+
+# def start_avoider(current: HubStruct, walked: list, distance: int) -> bool:
+#     while distance > 0:
+#         for hub in current.linked_hubs:
+#             if start_search(hub, walked) is False:
+#                 distance -= 1
+#                 if distance == 0:
+#                     return True
+#                 current = hub
+#                 break
+#         if distance > 0:
+#             return False
+#     return True
+
+
 def compare_best_paths(best_path: dict, path_attempt: list,
                        current: list) -> dict:
+
     if path_attempt['cost'] != -1:
         if best_path['cost'] == -1:
             best_path = path_setter(current, path_attempt)
