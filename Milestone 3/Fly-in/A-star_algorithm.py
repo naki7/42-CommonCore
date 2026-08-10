@@ -41,7 +41,7 @@ def path_setter(walked: list, attempt: dict) -> dict:
 
 
 def hub_checker(walked: list, current: HubStruct) -> bool:
-    if current.name not in ('start', 'goal') and current.current_usage >= current.capacity:
+    if current.current_usage >= current.capacity:
         return True
 
     for hub in walked:
@@ -51,17 +51,17 @@ def hub_checker(walked: list, current: HubStruct) -> bool:
     return False
 
 
-def goal_chaser(current: HubStruct, walked: list) -> bool:
+def goal_chaser(current: HubStruct, walked: list, goal_name: str) -> bool:
     goal_found: int = False
     bad_found: int = False
     previous_hub: HubStruct = walked[len(walked) - 1]
 
     while goal_found is False and bad_found is False:
         if len(current.linked_hubs) == 2:
-            if current.linked_hubs[0].name == 'goal':
+            if current.linked_hubs[0].name == goal_name:
                 goal_found = True
                 break
-            elif current.linked_hubs[1].name == 'goal':
+            elif current.linked_hubs[1].name == goal_name:
                 goal_found = True
                 break
             for hub in walked:
@@ -89,34 +89,6 @@ def goal_chaser(current: HubStruct, walked: list) -> bool:
         return False
 
 
-# def start_search(current: HubStruct, walked: list) -> bool:
-#     for hub in current.linked_hubs:
-#         if hub.name == current.name:
-#             continue
-#         for prev in walked:
-#             if prev.name == current.name:
-#                 continue
-#         if hub.name == 'goal':
-#             return False
-#         if hub.name == 'start':
-#             return True
-#     return False
-
-
-# def start_avoider(current: HubStruct, walked: list, distance: int) -> bool:
-#     while distance > 0:
-#         for hub in current.linked_hubs:
-#             if start_search(hub, walked) is False:
-#                 distance -= 1
-#                 if distance == 0:
-#                     return True
-#                 current = hub
-#                 break
-#         if distance > 0:
-#             return False
-#     return True
-
-
 def compare_best_paths(best_path: dict, path_attempt: list,
                        current: list) -> dict:
 
@@ -141,8 +113,7 @@ def compare_best_paths(best_path: dict, path_attempt: list,
     return best_path
 
 
-def check_neighbor_costs(current: list, path_len: int, drone: Drone,
-                        goal_name: str) -> list:
+def dijkstra(current: list, path_len: int, goal_name: str) -> list:
     start_hub: HubStruct = current[path_len - 1]
 
     if start_hub.name == goal_name:
@@ -204,6 +175,113 @@ def check_neighbor_costs(current: list, path_len: int, drone: Drone,
     return []
 
 
+def astar(current: list, path_len: int, goal_name: str) -> list:
+    best_path: dict = {'cost': -1, 'hubs': [], 'priority': 0}
+    result_hubs: list = []
+    link_check: Connection = None
+    name_check: bool = False
+    chase_check: bool = False
+
+    for first_link in current[path_len - 1].linked_hubs:
+        path_attempt: dict = {'cost': -1, 'hubs': [], 'priority': 0}
+        second_hub: dict = {'cost': -1, 'hub': None}
+
+        if first_link.name == goal_name:
+            best_path = {'cost': 1, 'hubs': [first_link]}
+            break
+
+        num_links: int = 0
+        for link in first_link.connections:
+            num_links += 1
+        if num_links < 2:
+            if first_link.linked_hubs[0].name == goal_name:
+                pass
+            else:
+                continue
+        else:
+            chase_check = goal_chaser(first_link, current, goal_name)
+            if chase_check is True:
+                if first_link.current_usage < first_link.capacity:
+                    best_path['cost'] = 0
+                    best_path['priority'] = 1
+                    best_path['hubs'].append(first_link)
+                    best_path['hubs'].append(first_link.linked_hubs[0])
+                    break
+
+        name_check = hub_checker(current, first_link)
+        if name_check is True:
+            if isinstance(current, Connection):
+                continue
+
+        if first_link.type != 'restricted':
+            if first_link.current_usage >= first_link.capacity:
+                continue
+
+        if first_link.type == 'blocked':
+            continue
+        elif first_link.type == 'restricted':
+            link_check = get_connect(current[path_len - 1], first_link)
+            if link_check is not None:
+                if link_check.current_usage >= link_check.capacity:
+                    continue
+            path_attempt['cost'] = 2
+        else:
+            path_attempt['cost'] = 1
+            if first_link.type == 'priority':
+                path_attempt['priority'] = 2
+        path_attempt['hubs'].append(first_link)
+
+        for second_link in first_link.linked_hubs:
+            if second_link.name == goal_name:
+                second_hub['cost'] = -1
+                path_attempt['hubs'].append(second_link)
+                path_attempt['priority'] = 1
+                break
+
+            name_check = hub_checker(current, second_link)
+            if name_check is True:
+                continue
+
+            if second_link.type == 'blocked':
+                continue
+            elif second_link.type == 'restricted':
+                continue
+
+            # avoid stepping into an immediate dead-end branch
+            onward_hubs = [hub for hub in second_link.linked_hubs
+                           if hub.name != first_link.name]
+            if len(onward_hubs) == 0:
+                onward_hubs = [hub for hub in first_link.linked_hubs
+                               if hub.name != current[path_len - 1].name and
+                               hub.name != second_link.name]
+                if len(onward_hubs) == 0:
+                    path_attempt = {'cost': -1, 'hubs': [], 'priority': 0}
+                continue
+            else:
+                chase_check = goal_chaser(second_link, current, goal_name)
+                if chase_check is True:
+                    if second_link.current_usage < second_link.capacity:
+                        best_path['cost'] = 0
+                        best_path['priority'] = 1
+                        best_path['hubs'].append(second_link)
+                        best_path['hubs'].append(second_link.linked_hubs[0])
+                        break
+
+            if second_hub['cost'] > 1:
+                second_hub['cost'] = 1
+                second_hub['hub'] = second_link
+
+        if second_hub['cost'] != -1:
+            path_attempt['cost'] += second_hub['cost']
+            path_attempt['hubs'].append(second_hub['hub'])
+        best_path = compare_best_paths(best_path, path_attempt, current)
+
+    for hub in best_path['hubs']:
+        result_hubs.append(hub)
+
+    return result_hubs
+
+
 def path_finder(drones: list, state: sim_state) -> None:
     searching_drones: int = len(drones)
 
@@ -227,12 +305,15 @@ def path_finder(drones: list, state: sim_state) -> None:
 
                 # finds the best next turns for the current drone
                 if drone.next_hub is None:
-                    temp: list = check_neighbor_costs(
-                        drone.current_path,
-                        drone.path_len,
-                        drone,
-                        state.goal_name
-                    )
+                    if state.num_hubs > 10:
+                        temp: list = dijkstra(drone.current_path,
+                                              drone.path_len,
+                                              state.goal_name)
+                    else:
+                        temp: list = astar(drone.current_path,
+                                           drone.path_len,
+                                           state.goal_name)
+
                 else:
                     temp: list = [drone.next_hub]
                 temp_len: int = len(temp) + prev_len
@@ -276,14 +357,15 @@ def path_finder(drones: list, state: sim_state) -> None:
                             local_name: str = drone.current_path[i].name
                             turn_result[f'D{drone.id}'] = local_name
                 drone.path_len = temp_len
-                if state.output_type == 'pygame':
-                    time.sleep(0.1)
-                if state.output_type == 'both':
-                    time.sleep(0.1)
+                # if state.output_type == 'pygame':
+                #     time.sleep(0.4)
+                # if state.output_type == 'both':
+                #     time.sleep(0.4)
                 time.sleep(0.1)
 
                 # sets drone to no longer be looped
-                if drone.current_path[drone.path_len - 1].name == state.goal_name:
+                if drone.current_path[
+                        drone.path_len - 1].name == state.goal_name:
                     drone.status = 'plotted'
 
             # sets drone count to reduce and eventually ending loop
@@ -295,32 +377,6 @@ def path_finder(drones: list, state: sim_state) -> None:
         state.update_state(turn_result)
 
     state.produce_end()
-
-
-# def pathway_prechecks(sim_config: sim_state) -> sim_state:
-#     node_list: list = []
-
-#     for hub in sim_config['hubs'][0].linked_hubs:
-#         if hub.type != 'blocked':
-#             node_list.append(hub)
-#     sim_config['hubs'][0].checked = True
-
-#     for node in node_list:
-#         curr_node_count: int = 0
-#         if node.name != 'goal':
-#             node.checked = True
-#         for hub in node.linked_hubs:
-#             if hub.checked is False and hub.type != 'blocked':
-#                 curr_node_count += 1
-#                 node_list.append(hub)
-#         if curr_node_count == 0:
-#             if node.name != 'goal':
-#                 hub.type = 'blocked'
-
-#     for node in node_list:
-#         print(f'{node.name} - {node.type}')
-
-#     return sim_config
 
 
 def main() -> None:
@@ -352,11 +408,9 @@ def main() -> None:
         quit()
 
     sim_config: dict = base_structure(parser_main(sys.argv[1]))
-    # sim_config = pathway_prechecks(sim_config)
 
     state_saver: sim_state = sim_state(sim_config, output_type)
     path_finder(sim_config['drones'], state_saver)
 
 
-if __name__ == '__main__':
-    main()
+main()
