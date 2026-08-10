@@ -9,6 +9,7 @@ class sim_state:
     def __init__(self, config: dict, output_type: str):
         self.num_hubs: int = config['total_hubs']
         self.hubs: dict = config['hubs']
+        self.goal_name: str = config['goal_name']
         self.connections: list = config['connections']
         self.drones: list = [f'D{drone.id}' for drone in config['drones']]
         self.current_turn: int = 0
@@ -44,6 +45,10 @@ class sim_state:
                     hub_color = pygame.Color('dodgerblue3')
                 elif config_color == 'red':
                     hub_color = pygame.Color('red4')
+                elif config_color == 'black':
+                    hub_color = pygame.Color('white')
+                elif config_color == 'rainbow':
+                    hub_color = pygame.Color('violetred')
                 else:
                     hub_color = pygame.Color(self.graph[i][j].color)
                 pygame.draw.rect(self.display, (hub_color),
@@ -315,7 +320,7 @@ def turn_print(turn_result: dict, out_type: str, hubs: list) -> str:
         if num_moves != 0:
             turn_str += ' '
 
-    if out_type == 'default' or out_type == 'neither':
+    if out_type != 'pygame':
         rprint(turn_str)
     else:
         return turn_str

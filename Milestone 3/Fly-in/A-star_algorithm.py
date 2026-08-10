@@ -4,6 +4,8 @@ from output import sim_state
 import pygame
 import time
 import sys
+import heapq
+import itertools
 
 
 def get_connect(current: HubStruct, next: HubStruct) -> Connection:
@@ -39,7 +41,7 @@ def path_setter(walked: list, attempt: dict) -> dict:
 
 
 def hub_checker(walked: list, current: HubStruct) -> bool:
-    if current.current_usage >= current.capacity:
+    if current.name not in ('start', 'goal') and current.current_usage >= current.capacity:
         return True
 
     for hub in walked:
@@ -139,111 +141,67 @@ def compare_best_paths(best_path: dict, path_attempt: list,
     return best_path
 
 
-def check_neighbor_costs(current: list, path_len: int, drone: Drone) -> list:
-    best_path: dict = {'cost': -1, 'hubs': [], 'priority': 0}
-    result_hubs: list = []
-    link_check: Connection = None
-    name_check: bool = False
-    chase_check: bool = False
+def check_neighbor_costs(current: list, path_len: int, drone: Drone,
+                        goal_name: str) -> list:
+    start_hub: HubStruct = current[path_len - 1]
 
-    for first_link in current[path_len - 1].linked_hubs:
-        path_attempt: dict = {'cost': -1, 'hubs': [], 'priority': 0}
-        second_hub: dict = {'cost': -1, 'hub': None}
+    if start_hub.name == goal_name:
+        return []
 
-        if first_link.name == 'goal':
-            best_path = {'cost': 1, 'hubs': [first_link]}
-            break
+    def hub_cost(hub: HubStruct) -> int:
+        if hub.type == 'restricted':
+            return 2
+        return 1
 
-        num_links: int = 0
-        for link in first_link.connections:
-            num_links += 1
-        if num_links < 2:
-            if first_link.linked_hubs[0].name == 'goal':
-                pass
-            else:
+    def hub_priority(hub: HubStruct) -> int:
+        return 1 if hub.type == 'priority' else 0
+
+    def is_accessible(hub: HubStruct) -> bool:
+        if hub.type == 'blocked':
+            return False
+        if hub.name == goal_name:
+            return True
+        if hub.name != 'start' and hub.current_usage >= hub.capacity:
+            return False
+        return True
+
+    def connection_available(a: HubStruct, b: HubStruct) -> bool:
+        link = get_connect(a, b)
+        if link is None:
+            return True
+        return link.current_usage < link.capacity
+
+    queue: list = []
+    counter = itertools.count()
+    heapq.heappush(queue, (0, 0, next(counter), [start_hub]))
+    best_scores: dict = {start_hub.name: (0, 0)}
+
+    while queue:
+        cost, neg_priority, _, path = heapq.heappop(queue)
+        current_hub: HubStruct = path[-1]
+        if current_hub.name == goal_name:
+            return [path[1]]
+
+        for neighbor in current_hub.linked_hubs:
+            if not is_accessible(neighbor):
                 continue
-        else:
-            chase_check = goal_chaser(first_link, current)
-            if chase_check is True:
-                if first_link.current_usage < first_link.capacity:
-                    best_path['cost'] = 0
-                    best_path['priority'] = 1
-                    best_path['hubs'].append(first_link)
-                    best_path['hubs'].append(first_link.linked_hubs[0])
-                    break
-
-        name_check = hub_checker(current, first_link)
-        if name_check is True:
-            if isinstance(current, Connection):
+            if not connection_available(current_hub, neighbor):
                 continue
-
-        if first_link.type != 'restricted':
-            if first_link.current_usage >= first_link.capacity:
-                continue
-
-        if first_link.type == 'blocked':
-            continue
-        elif first_link.type == 'restricted':
-            link_check = get_connect(current[path_len - 1], first_link)
-            if link_check is not None:
-                if link_check.current_usage >= link_check.capacity:
-                    continue
-            path_attempt['cost'] = 2
-        else:
-            path_attempt['cost'] = 1
-            if first_link.type == 'priority':
-                path_attempt['priority'] = 2
-        path_attempt['hubs'].append(first_link)
-
-        for second_link in first_link.linked_hubs:
-            if second_link.name == 'goal':
-                second_hub['cost'] = -1
-                path_attempt['hubs'].append(second_link)
-                path_attempt['priority'] = 1
-                break
-
-            name_check = hub_checker(current, second_link)
-            if name_check is True:
+            if neighbor.name in [hub.name for hub in path]:
                 continue
 
-            if second_link.type == 'blocked':
+            next_cost = cost + hub_cost(neighbor)
+            next_priority = -neg_priority + hub_priority(neighbor)
+            prev = best_scores.get(neighbor.name)
+            current_score = (next_cost, -next_priority)
+            if prev is not None and prev <= current_score:
                 continue
-            elif second_link.type == 'restricted':
-                continue
 
-            # avoid stepping into an immediate dead-end branch
-            onward_hubs = [hub for hub in second_link.linked_hubs
-                           if hub.name != first_link.name]
-            if len(onward_hubs) == 0:
-                onward_hubs = [hub for hub in first_link.linked_hubs
-                               if hub.name != current[path_len - 1].name and
-                               hub.name != second_link.name]
-                if len(onward_hubs) == 0:
-                    path_attempt = {'cost': -1, 'hubs': [], 'priority': 0}
-                continue
-            else:
-                chase_check = goal_chaser(second_link, current)
-                if chase_check is True:
-                    if second_link.current_usage < second_link.capacity:
-                        best_path['cost'] = 0
-                        best_path['priority'] = 1
-                        best_path['hubs'].append(second_link)
-                        best_path['hubs'].append(second_link.linked_hubs[0])
-                        break
+            best_scores[neighbor.name] = current_score
+            heapq.heappush(queue, (next_cost, -next_priority,
+                                   next(counter), path + [neighbor]))
 
-            if second_hub['cost'] > 1:
-                second_hub['cost'] = 1
-                second_hub['hub'] = second_link
-
-        if second_hub['cost'] != -1:
-            path_attempt['cost'] += second_hub['cost']
-            path_attempt['hubs'].append(second_hub['hub'])
-        best_path = compare_best_paths(best_path, path_attempt, current)
-
-    for hub in best_path['hubs']:
-        result_hubs.append(hub)
-
-    return result_hubs
+    return []
 
 
 def path_finder(drones: list, state: sim_state) -> None:
@@ -269,9 +227,12 @@ def path_finder(drones: list, state: sim_state) -> None:
 
                 # finds the best next turns for the current drone
                 if drone.next_hub is None:
-                    temp: list = check_neighbor_costs(drone.current_path,
-                                                      drone.path_len,
-                                                      drone)
+                    temp: list = check_neighbor_costs(
+                        drone.current_path,
+                        drone.path_len,
+                        drone,
+                        state.goal_name
+                    )
                 else:
                     temp: list = [drone.next_hub]
                 temp_len: int = len(temp) + prev_len
@@ -293,7 +254,7 @@ def path_finder(drones: list, state: sim_state) -> None:
                         else:
                             curr_i: int = i - prev_len
                             if temp[curr_i].type != 'restricted':
-                                if temp[curr_i].name == 'goal':
+                                if temp[curr_i].name == state.goal_name:
                                     pass
 
                                 drone.current_path.append(temp[curr_i])
@@ -316,13 +277,13 @@ def path_finder(drones: list, state: sim_state) -> None:
                             turn_result[f'D{drone.id}'] = local_name
                 drone.path_len = temp_len
                 if state.output_type == 'pygame':
-                    time.sleep(0.4)
+                    time.sleep(0.1)
                 if state.output_type == 'both':
-                    time.sleep(0.4)
+                    time.sleep(0.1)
                 time.sleep(0.1)
 
                 # sets drone to no longer be looped
-                if drone.current_path[drone.path_len - 1].name == 'goal':
+                if drone.current_path[drone.path_len - 1].name == state.goal_name:
                     drone.status = 'plotted'
 
             # sets drone count to reduce and eventually ending loop
@@ -336,9 +297,35 @@ def path_finder(drones: list, state: sim_state) -> None:
     state.produce_end()
 
 
+# def pathway_prechecks(sim_config: sim_state) -> sim_state:
+#     node_list: list = []
+
+#     for hub in sim_config['hubs'][0].linked_hubs:
+#         if hub.type != 'blocked':
+#             node_list.append(hub)
+#     sim_config['hubs'][0].checked = True
+
+#     for node in node_list:
+#         curr_node_count: int = 0
+#         if node.name != 'goal':
+#             node.checked = True
+#         for hub in node.linked_hubs:
+#             if hub.checked is False and hub.type != 'blocked':
+#                 curr_node_count += 1
+#                 node_list.append(hub)
+#         if curr_node_count == 0:
+#             if node.name != 'goal':
+#                 hub.type = 'blocked'
+
+#     for node in node_list:
+#         print(f'{node.name} - {node.type}')
+
+#     return sim_config
+
+
 def main() -> None:
     output_type: str = 'default'
-    preplanned_outputs: list = ['terminal', 'pygame', 'neither', 'both']
+    preplanned_outputs: list = ['terminal', 'pygame', 'both']
 
     if len(sys.argv) < 2:
         print("Invalid command line input",
@@ -365,9 +352,11 @@ def main() -> None:
         quit()
 
     sim_config: dict = base_structure(parser_main(sys.argv[1]))
+    # sim_config = pathway_prechecks(sim_config)
 
     state_saver: sim_state = sim_state(sim_config, output_type)
     path_finder(sim_config['drones'], state_saver)
 
 
-main()
+if __name__ == '__main__':
+    main()

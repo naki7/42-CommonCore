@@ -24,6 +24,7 @@ class Hub:
         self.linked_hubs: list = []
         self.current_usage: int = 0
         self.occupants: list = []
+        # self.checked: bool = False
 
     def get_links(self, connections: list) -> list:
         links_list: list = []
@@ -128,5 +129,6 @@ def base_structure(config: dict) -> dict:
         'drones': drones,
         'connections': connections,
         'hubs': hubs,
+        'goal_name': hubs[-1].name,
         'total_hubs': total_hubs
         }
