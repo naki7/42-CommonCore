@@ -50,7 +50,10 @@ class sim_state:
                 elif config_color == 'rainbow':
                     hub_color = pygame.Color('violetred')
                 else:
-                    hub_color = pygame.Color(self.graph[i][j].color)
+                    try:
+                        hub_color = pygame.Color(self.graph[i][j].color)
+                    except ValueError:
+                        hub_color = pygame.Color('snow3')
                 pygame.draw.rect(self.display, (hub_color),
                                  [x * 180, y * 180, 100, 75],
                                  0)
@@ -231,7 +234,7 @@ class sim_state:
         self.turn_saver.append(turn_print(init_turn, self.output_type,
                                           self.hubs))
         if self.output_type == 'pygame' or self.output_type == 'both':
-            self.graph = create_graph(self.hubs, self.connections)
+            self.graph = create_graph(self.hubs)
             self.sim_init()
             self.sim_updater()
 
@@ -255,7 +258,7 @@ class sim_state:
 
         if self.output_type == 'pygame' or self.output_type == 'both':
             for turn in self.turn_saver:
-                print(turn)
+                rprint(turn)
         print('-' * 16)
         print(f"Turns to complete full sim: {self.current_turn}")
         print("Average number of drones moved per turn:",
@@ -264,7 +267,7 @@ class sim_state:
         print(f"Sum of turns taken by drones: {self.total_cost}")
 
 
-def create_graph(hubs: list, links: list) -> dict:
+def create_graph(hubs: list) -> dict:
     row_track: dict = {}
     graph_track: dict = {}
     min_x: int = 1
