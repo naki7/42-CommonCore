@@ -64,8 +64,8 @@ def hub_handler(config_arr: list) -> dict:
             raise ValueError(f'{start_hub[1]}')
     elif len(end_hub) != 1:
         print('Incorrect number of end_hubs')
-        if len(start_hub) < 1:
-            raise ValueError('no start_hubs')
+        if len(end_hub) < 1:
+            raise ValueError('no end_hubs')
         else:
             raise ValueError(f'{start_hub[1]}')
 
@@ -289,7 +289,7 @@ def parser_main(config_file: str) -> dict:
     except ValueError as alert:
         if f'{alert}' == 'nb_drones':
             print(f'Error: {alert} not on first line\n    Found on line 1')
-        elif f'{alert}' == 'no start_hubs' or alert == 'no end_hubs':
+        elif f'{alert}' == 'no start_hubs' or f'{alert}' == 'no end_hubs':
             print(f'Error: {alert}_hubs\n   Found in lines 1 to ',
                   f'{len(origin_arr)}')
         else:
