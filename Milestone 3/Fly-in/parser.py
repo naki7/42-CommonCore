@@ -119,11 +119,22 @@ def hub_handler(config_arr: list) -> dict:
                 raise ValueError(temp_extra)
 
         # passing input into specific hub definer
+        try:
+            temp_x: int = int(temp_arr[2])
+        except ValueError:
+            print('Invalid (non-integer) input for x value.')
+            raise ValueError(f'{line}')
+        try:
+            temp_y: int = int(temp_arr[3])
+        except ValueError:
+            print('Invalid (non-integer) input for y value.')
+            raise ValueError(f'{line}')
+
         if temp_arr[0] == 'start_hub:':
             hub_dict["start_hub"] = HubStruct(
                 name=temp_arr[1],
-                x=int(temp_arr[2]),
-                y=int(temp_arr[3]),
+                x=temp_x,
+                y=temp_y,
                 zone=zone,
                 color=color,
                 max_drones=max_drones
@@ -131,8 +142,8 @@ def hub_handler(config_arr: list) -> dict:
         elif temp_arr[0] == 'end_hub:':
             hub_dict["end_hub"] = HubStruct(
                 name=temp_arr[1],
-                x=int(temp_arr[2]),
-                y=int(temp_arr[3]),
+                x=temp_x,
+                y=temp_y,
                 zone=zone,
                 color=color,
                 max_drones=max_drones
@@ -140,8 +151,8 @@ def hub_handler(config_arr: list) -> dict:
         elif temp_arr[0] == 'hub:':
             hub_dict[f"{temp_arr[1]}_hub"] = HubStruct(
                 name=temp_arr[1],
-                x=int(temp_arr[2]),
-                y=int(temp_arr[3]),
+                x=temp_x,
+                y=temp_y,
                 zone=zone,
                 color=color,
                 max_drones=max_drones
@@ -278,7 +289,7 @@ def parser_main(config_file: str) -> dict:
     except ValueError as alert:
         if f'{alert}' == 'nb_drones':
             print(f'Error: {alert} not on first line\n    Found on line 1')
-        elif f'{alert}' == 'no start' or alert == 'no end':
+        elif f'{alert}' == 'no start_hubs' or alert == 'no end_hubs':
             print(f'Error: {alert}_hubs\n   Found in lines 1 to ',
                   f'{len(origin_arr)}')
         else:
