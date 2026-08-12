@@ -116,7 +116,7 @@ def path_finder(drones: list, state: sim_state) -> None:
 
 def main() -> None:
     output_type: str = 'default'
-    preplanned_outputs: list = ['terminal', 'pygame', 'both']
+    preplanned_outputs: list = ['terminal', 'pygame', 'both', 'default']
 
     if len(sys.argv) < 2:
         print("Invalid command line input",

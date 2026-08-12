@@ -203,28 +203,32 @@ Pygame was used as mentioned above for the graphical output. This was made
 ### Installation
 
 Due to the fact that this program requires both pydantic, rich and pygame to be
-    installed before running, it is highly recommended that either you
-    validate if they are installed locally before running the program or
-    creating a safer virtual environment to run the program in. To complete
-    the second option, input these terminal commands:
+    installed before running, the Makefile create a virtual environment to run
+    the program in and install all the dependencies. First run:
 
     ```
-    python3 -m venv venv
-    source ./venv/bin/activate
-    pip install pydantic pygame rich
+    make install
+    ```
+
+Then to enter the virtual environment use the command:
+
+    ```
+    source ./matrix/bin/activate
     ```
 
 To leave the virtual environment simply call the command:
+
     ```
     deactivate
     ```
 
 If you would like to run typing and syntax checks you can run these commands
-    (note they will need to be installed if not already):
+    (note this is best done before using make install, or after using make
+    clean - ensuring you are also outside of the virtual environment):
 
     ```
-    flake8 .
-    mypy .
+    make lint
+    make lint-strict
     ```
 
 ### Executing the Program
@@ -232,7 +236,7 @@ If you would like to run typing and syntax checks you can run these commands
 To then execute Fly-in you can call the following terminal commands:
 
     ```
-    python3 fly_in.py <./file_path/file_name.extension> <optional_argument>
+    make run FILE=<optional_file_path> OUTPUT=<optional_argument>
     ```
 In the above template the text in between <> can be replaced with the required
     file directories, and file names. The optional_argument if left blank will
@@ -241,6 +245,11 @@ In the above template the text in between <> can be replaced with the required
     specified this will run the program to output only using the graphical
     display, and lastly, if 'both' is used, it will then run both the terminal
     output and the graphical display.
+
+While running pygame, you can press 'esc' key or the close terminal UI button
+    and the pygame will close. The program will continue running and produce
+    terminal output instead. You can force close the terminal output/program
+    early like normal using 'Ctrl+c' on the terminal.
 
 ### Example Input and Expected Output
 
@@ -278,7 +287,7 @@ For the files, I would suggest using the ones provided or creating a txt file
 Lastly, you can then run the below command if all files are in place:
 
     ```
-    python3 fly_in.py ./maps/easy/test.txt pygame
+    make run FILE=./maps/easy/test.txt OUTPUT=pygame
     ```
 
 ## Resources

@@ -256,7 +256,7 @@ class sim_state:
     def produce_end(self) -> None:
         num_drones: int = len(self.drones)
 
-        if self.output_type == 'pygame' or self.output_type == 'both':
+        if self.output_type == 'pygame':
             for turn in self.turn_saver:
                 rprint(turn)
         print('-' * 16)
