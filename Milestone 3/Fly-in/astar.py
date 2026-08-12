@@ -1,10 +1,10 @@
-from infrastructure import HubStruct, Connection
+from infrastructure import Hub, Connection
 
 
-def goal_chaser(current: HubStruct, walked: list, goal_name: str) -> bool:
+def goal_chaser(current: Hub, walked: list, goal_name: str) -> bool:
     goal_found: int = False
     bad_found: int = False
-    previous_hub: HubStruct = walked[len(walked) - 1]
+    previous_hub: Hub = walked[len(walked) - 1]
 
     while goal_found is False and bad_found is False:
         if len(current.linked_hubs) == 2:
@@ -39,9 +39,10 @@ def goal_chaser(current: HubStruct, walked: list, goal_name: str) -> bool:
         return False
 
 
-def hub_checker(walked: list, current: HubStruct) -> bool:
-    if current.current_usage >= current.capacity:
-        return True
+def hub_checker(walked: list, current: Hub) -> bool:
+    if current.capacity is not None:
+        if current.current_usage >= current.capacity:
+            return True
 
     for hub in walked:
         if hub.name == current.name:
@@ -73,7 +74,7 @@ def path_setter(walked: list, attempt: dict) -> dict:
     return attempt
 
 
-def compare_best_paths(best_path: dict, path_attempt: list,
+def compare_best_paths(best_path: dict, path_attempt: dict,
                        current: list) -> dict:
 
     if path_attempt['cost'] != -1:
@@ -100,7 +101,7 @@ def compare_best_paths(best_path: dict, path_attempt: list,
 def astar(current: list, path_len: int, goal_name: str) -> list:
     best_path: dict = {'cost': -1, 'hubs': [], 'priority': 0}
     result_hubs: list = []
-    link_check: Connection = None
+    link_check: Connection | None = None
     name_check: bool = False
     chase_check: bool = False
     from fly_in import get_connect

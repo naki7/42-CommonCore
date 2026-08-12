@@ -1,4 +1,4 @@
-from typing import TextIO, Union, Any
+from typing import Union, Any
 from pydantic import BaseModel, Field, field_validator, ValidationInfo
 from pydantic import model_validator
 
@@ -84,9 +84,9 @@ def hub_handler(config_arr: list) -> dict:
             print('multiple hubs with the same name')
             raise ValueError(f'{line}')
 
-        zone: str = None
-        color: str = None
-        max_drones: int = None
+        zone: str | None = None
+        color: str | None = None
+        max_drones: int | None = None
         for item in extras_arr:
             stripped: str = item.strip('[]')
             temp_extra: list = stripped.split('=')
@@ -255,7 +255,7 @@ def parser(origin_arr: list) -> dict:
     return config_dict
 
 
-def parser_main(config_file: TextIO) -> dict:
+def parser_main(config_file: str) -> dict:
     text: str = ""
     origin_arr: list = []
     parse_result: dict = {}
@@ -286,3 +286,6 @@ def parser_main(config_file: TextIO) -> dict:
                 if origin_arr[i].find(f'{alert}') != -1:
                     print(f"Error: {alert}\n    Found on line {i + 1}",
                           f"of {config_file}")
+        quit()
+
+    return parse_result

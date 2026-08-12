@@ -16,9 +16,9 @@ class Hub:
         self.name: str = config.name
         self.x: int = config.x
         self.y: int = config.y
-        self.type: str = config.zone
-        self.color: str = config.color
-        self.capacity: int = config.max_drones
+        self.type: str | None = config.zone
+        self.color: str | None = config.color
+        self.capacity: int | None = config.max_drones
         self.connections: list = []
         self.connect_names: list = self.get_links(connections)
         self.linked_hubs: list = []
@@ -48,12 +48,12 @@ class Hub:
             self.current_usage += 1
             self.occupants.append(drone)
             return True
-        elif self.current_usage < self.capacity:
-            self.current_usage += 1
-            self.occupants.append(drone)
-            return True
-        else:
-            return False
+        elif self.capacity is not None:
+            if self.current_usage < self.capacity:
+                self.current_usage += 1
+                self.occupants.append(drone)
+                return True
+        return False
 
     def remove_drone(self, drone: Drone) -> bool:
         if self.current_usage > 0:
@@ -70,7 +70,7 @@ class Connection:
         self.hubs: tuple = (config[0], config[1])
         self.name: str = f'{config[0]}-{config[1]}'
         self.linked_hubs: list = []
-        self.init_hub: HubStruct = None
+        self.init_hub: HubStruct | None = None
         self.capacity: int = config[2]
         self.current_usage: int = 0
         self.occupants: list = []

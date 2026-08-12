@@ -1,37 +1,41 @@
-from infrastructure import HubStruct
+from infrastructure import Hub
 import heapq
 import itertools
 
 
 def dijkstra(current: list, path_len: int, goal_name: str) -> list:
-    start_hub: HubStruct = current[path_len - 1]
+    start_hub: Hub = current[path_len - 1]
     from fly_in import get_connect
 
     if start_hub.name == goal_name:
         return []
 
-    def hub_cost(hub: HubStruct) -> int:
+    def hub_cost(hub: Hub) -> int:
         if hub.type == 'restricted':
             return 2
         return 1
 
-    def hub_priority(hub: HubStruct) -> int:
+    def hub_priority(hub: Hub) -> int:
         return 1 if hub.type == 'priority' else 0
 
-    def is_accessible(hub: HubStruct) -> bool:
+    def is_accessible(hub: Hub) -> bool:
         if hub.type == 'blocked':
             return False
         if hub.name == goal_name:
             return True
-        if hub.name != 'start' and hub.current_usage >= hub.capacity:
-            return False
+        if hub.capacity is not None:
+            if hub.name != 'start' and hub.current_usage >= hub.capacity:
+                return False
         return True
 
-    def connection_available(a: HubStruct, b: HubStruct) -> bool:
+    def connection_available(a: Hub, b: Hub) -> bool:
         link = get_connect(a, b)
         if link is None:
             return True
-        return link.current_usage < link.capacity
+        if link.current_usage < link.capacity:
+            return True
+        else:
+            return False
 
     queue: list = []
     counter = itertools.count()
@@ -40,7 +44,7 @@ def dijkstra(current: list, path_len: int, goal_name: str) -> list:
 
     while queue:
         cost, neg_priority, _, path = heapq.heappop(queue)
-        current_hub: HubStruct = path[-1]
+        current_hub: Hub = path[-1]
         if current_hub.name == goal_name:
             return [path[1]]
 

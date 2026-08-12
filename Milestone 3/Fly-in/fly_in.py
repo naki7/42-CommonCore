@@ -1,4 +1,5 @@
-from infrastructure import base_structure, HubStruct, Connection
+from infrastructure import base_structure, Hub, Connection
+from typing import Any
 from parser import parser_main
 from output import sim_state
 from dijkstra import dijkstra
@@ -8,13 +9,14 @@ import time
 import sys
 
 
-def get_connect(current: HubStruct, next: HubStruct) -> Connection:
+def get_connect(current: Hub, next: Hub) -> Any:
     current_name: str = f'{current.name}-{next.name}'
     reverse_name: str = f'{next.name}-{current.name}'
 
     for link in current.connections:
         if link.name == current_name or link.name == reverse_name:
             return link
+    return None
 
 
 def path_finder(drones: list, state: sim_state) -> None:
@@ -45,12 +47,11 @@ def path_finder(drones: list, state: sim_state) -> None:
                                               drone.path_len,
                                               state.goal_name)
                     else:
-                        temp: list = astar(drone.current_path,
-                                           drone.path_len,
-                                           state.goal_name)
+                        temp = astar(drone.current_path, drone.path_len,
+                                     state.goal_name)
 
                 else:
-                    temp: list = [drone.next_hub]
+                    temp = [drone.next_hub]
                 temp_len: int = len(temp) + prev_len
 
                 # cleans out the second hub so turns print one at a time
@@ -92,11 +93,24 @@ def path_finder(drones: list, state: sim_state) -> None:
                             local_name: str = drone.current_path[i].name
                             turn_result[f'D{drone.id}'] = local_name
                 drone.path_len = temp_len
-                # if state.output_type == 'pygame':
-                #     time.sleep(0.4)
-                # if state.output_type == 'both':
-                #     time.sleep(0.4)
-                time.sleep(0.1)
+                if state.output_type == 'pygame':
+                    if state.num_hubs < 15:
+                        time.sleep(0.4)
+                    elif state.num_hubs < 20:
+                        time.sleep(0.25)
+                    elif state.num_hubs < 35:
+                        time.sleep(0.1)
+                    else:
+                        time.sleep(0.05)
+                elif state.output_type == 'both':
+                    if state.num_hubs < 15:
+                        time.sleep(0.4)
+                    elif state.num_hubs < 20:
+                        time.sleep(0.25)
+                    elif state.num_hubs < 35:
+                        time.sleep(0.1)
+                    else:
+                        time.sleep(0.05)
 
                 # sets drone to no longer be looped
                 if drone.current_path[
