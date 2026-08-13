@@ -3,9 +3,9 @@ from pydantic import BaseModel, Field, field_validator, ValidationInfo
 from pydantic import model_validator
 
 
-def string_splitter(line: str) -> dict:
-    result_arr: list = []
-    dict_set: dict = {}
+def string_splitter(line: str) -> dict[Any, Any]:
+    result_arr: list[Any] = []
+    dict_set: dict[Any, Any] = {}
 
     result_arr = line.split(': ')
     try:
@@ -33,27 +33,28 @@ class HubStruct(BaseModel):
 
     @model_validator(mode='after')
     def values_validator(self) -> Any:
-        zone_arr: list = ['normal', 'blocked', 'restricted', 'priority']
+        zone_arr: list[str | None] = ['normal', 'blocked', 'restricted',
+                                      'priority']
         if zone_arr.count(self.zone) != 1:
             print('invalid zone inserted')
             raise ValueError(f'{self.zone}')
         return self
 
 
-def hub_handler(config_arr: list) -> dict:
-    hub_dict: dict = {
+def hub_handler(config_arr: list[Any]) -> dict[str, Any]:
+    hub_dict: dict[str, Any] = {
         'start_hub': {},
         'end_hub': {}
     }
-    hub_arr: list = [line for line in config_arr if
-                     line.startswith("hub") is True
-                     or line.startswith("start_hub") is True
-                     or line.startswith("end_hub") is True]
-    start_hub: list = [line for line in config_arr if
-                       line.startswith("start_hub") is True]
-    end_hub: list = [line for line in config_arr if
-                     line.startswith("end_hub") is True]
-    name_arr: list = []
+    hub_arr: list[str] = [line for line in config_arr if
+                          line.startswith("hub") is True
+                          or line.startswith("start_hub") is True
+                          or line.startswith("end_hub") is True]
+    start_hub: list[str] = [line for line in config_arr if
+                            line.startswith("start_hub") is True]
+    end_hub: list[str] = [line for line in config_arr if
+                          line.startswith("end_hub") is True]
+    name_arr: list[str] = []
 
     # check for valid num of start and end hubs (1 each)
     if len(start_hub) != 1:
@@ -71,11 +72,11 @@ def hub_handler(config_arr: list) -> dict:
 
     # validate and assign each line/hub
     for line in hub_arr:
-        temp_arr: list = line.split(' ')
-        extras_arr: list = [value for value in temp_arr if
-                            value.count('zone') != 0 or
-                            value.count('color') != 0 or
-                            value.count('max_drones') != 0]
+        temp_arr: list[str] = line.split(' ')
+        extras_arr: list[str] = [value for value in temp_arr if
+                                 value.count('zone') != 0 or
+                                 value.count('color') != 0 or
+                                 value.count('max_drones') != 0]
 
         # check names are all different
         if name_arr.count(temp_arr[1]) == 0:
@@ -89,7 +90,7 @@ def hub_handler(config_arr: list) -> dict:
         max_drones: int | None = None
         for item in extras_arr:
             stripped: str = item.strip('[]')
-            temp_extra: list = stripped.split('=')
+            temp_extra: list[str] = stripped.split('=')
 
             # check if the zone's name has a dash
             if temp_arr[1].count('-') != 0:
@@ -160,13 +161,14 @@ def hub_handler(config_arr: list) -> dict:
     return hub_dict
 
 
-def connection_handler(config_arr: list, hub_names: list) -> dict:
-    connect_dict: dict = {}
-    connect_arr: list = [line.split(': ') for line in config_arr if
-                         line.startswith("connection") is True]
-    link_arr: list = [line[1].split(' ') for line in connect_arr if
-                      line[1].find('max_link_capacity') != -1]
-    hub_dict: dict = {}
+def connection_handler(config_arr: list[str], hub_names: list[str]) -> dict[
+        Any, Any]:
+    connect_dict: dict[Any, Any] = {}
+    connect_arr: list[Any] = [line.split(': ') for line in config_arr if
+                              line.startswith("connection") is True]
+    link_arr: list[Any] = [line[1].split(' ') for line in connect_arr if
+                           line[1].find('max_link_capacity') != -1]
+    hub_dict: dict[Any, Any] = {}
 
     # removes all extra text so just the connections themselves remain
     connect_arr = [line[1] for line in connect_arr]
@@ -237,12 +239,12 @@ def connection_handler(config_arr: list, hub_names: list) -> dict:
     return connect_dict
 
 
-def parser(origin_arr: list) -> dict:
-    config_arr: list = []
-    config_dict: dict = {}
-    hub_dict: dict = {}
-    hub_names: list = []
-    connections_dict: dict = {}
+def parser(origin_arr: list[Any]) -> dict[Any, Any]:
+    config_arr: list[Any] = []
+    config_dict: dict[Any, Any] = {}
+    hub_dict: dict[Any, Any] = {}
+    hub_names: list[Any] = []
+    connections_dict: dict[Any, Any] = {}
 
     # remove comments and blank lines
     config_arr = [line for line in origin_arr if line.startswith('#') is False
@@ -279,10 +281,10 @@ def parser(origin_arr: list) -> dict:
     return config_dict
 
 
-def parser_main(config_file: str) -> dict:
+def parser_main(config_file: str) -> dict[Any, Any]:
     text: str = ""
-    origin_arr: list = []
-    parse_result: dict = {}
+    origin_arr: list[Any] = []
+    parse_result: dict[Any, Any] = {}
 
     # Read file, and then split the file from newlines into subscriptable list
     try:

@@ -19,11 +19,11 @@ def get_connect(current: Hub, next: Hub) -> Any:
     return None
 
 
-def path_finder(drones: list, state: sim_state) -> None:
+def path_finder(drones: list[Any], state: sim_state) -> None:
     searching_drones: int = len(drones)
 
     while searching_drones > 0:
-        turn_result: dict = {}
+        turn_result: dict[Any, Any] = {}
         for drone in drones:
 
             # check at start of loop to allow pygame to be closed
@@ -43,9 +43,9 @@ def path_finder(drones: list, state: sim_state) -> None:
                 # finds the best next turns for the current drone
                 if drone.next_hub is None:
                     if state.num_hubs > 10:
-                        temp: list = dijkstra(drone.current_path,
-                                              drone.path_len,
-                                              state.goal_name)
+                        temp: list[Any] = dijkstra(drone.current_path,
+                                                   drone.path_len,
+                                                   state.goal_name)
                     else:
                         temp = astar(drone.current_path, drone.path_len,
                                      state.goal_name)
@@ -130,7 +130,7 @@ def path_finder(drones: list, state: sim_state) -> None:
 
 def main() -> None:
     output_type: str = 'default'
-    preplanned_outputs: list = ['terminal', 'pygame', 'both', 'default']
+    preplanned_outputs: list[Any] = ['terminal', 'pygame', 'both', 'default']
 
     if len(sys.argv) < 2:
         print("Invalid command line input",
@@ -156,7 +156,7 @@ def main() -> None:
               sep='\n')
         quit()
 
-    sim_config: dict = base_structure(parser_main(sys.argv[1]))
+    sim_config: dict[Any, Any] = base_structure(parser_main(sys.argv[1]))
 
     state_saver: sim_state = sim_state(sim_config, output_type)
     path_finder(sim_config['drones'], state_saver)

@@ -1,7 +1,8 @@
 from infrastructure import Hub, Connection
+from typing import Any
 
 
-def goal_chaser(current: Hub, walked: list, goal_name: str) -> bool:
+def goal_chaser(current: Hub, walked: list[Any], goal_name: str) -> bool:
     goal_found: int = False
     bad_found: int = False
     previous_hub: Hub = walked[len(walked) - 1]
@@ -39,7 +40,7 @@ def goal_chaser(current: Hub, walked: list, goal_name: str) -> bool:
         return False
 
 
-def hub_checker(walked: list, current: Hub) -> bool:
+def hub_checker(walked: list[Any], current: Hub) -> bool:
     if current.capacity is not None:
         if current.current_usage >= current.capacity:
             return True
@@ -51,8 +52,8 @@ def hub_checker(walked: list, current: Hub) -> bool:
     return False
 
 
-def path_setter(walked: list, attempt: dict) -> dict:
-    exclude_hubs: list = []
+def path_setter(walked: list[Any], attempt: dict[Any, Any]) -> dict[Any, Any]:
+    exclude_hubs: list[Any] = []
 
     for hub in attempt['hubs']:
         for previous in walked:
@@ -74,9 +75,8 @@ def path_setter(walked: list, attempt: dict) -> dict:
     return attempt
 
 
-def compare_best_paths(best_path: dict, path_attempt: dict,
-                       current: list) -> dict:
-
+def compare_best_paths(best_path: dict[Any, Any], path_attempt: dict[Any, Any],
+                       current: list[Any]) -> dict[Any, Any]:
     if path_attempt['cost'] != -1:
         if best_path['cost'] == -1:
             best_path = path_setter(current, path_attempt)
@@ -98,17 +98,17 @@ def compare_best_paths(best_path: dict, path_attempt: dict,
     return best_path
 
 
-def astar(current: list, path_len: int, goal_name: str) -> list:
-    best_path: dict = {'cost': -1, 'hubs': [], 'priority': 0}
-    result_hubs: list = []
+def astar(current: list[Any], path_len: int, goal_name: str) -> list[Any]:
+    best_path: dict[Any, Any] = {'cost': -1, 'hubs': [], 'priority': 0}
+    result_hubs: list[Any] = []
     link_check: Connection | None = None
     name_check: bool = False
     chase_check: bool = False
     from fly_in import get_connect
 
     for first_link in current[path_len - 1].linked_hubs:
-        path_attempt: dict = {'cost': -1, 'hubs': [], 'priority': 0}
-        second_hub: dict = {'cost': -1, 'hub': None}
+        path_attempt: dict[Any, Any] = {'cost': -1, 'hubs': [], 'priority': 0}
+        second_hub: dict[Any, Any] = {'cost': -1, 'hub': None}
 
         if first_link.name == goal_name:
             best_path = {'cost': 1, 'hubs': [first_link]}

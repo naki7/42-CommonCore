@@ -4,25 +4,26 @@ with contextlib.redirect_stdout(None):
 from infrastructure import Hub
 from rich import print as rprint
 import time
+from typing import Any
 
 
 class sim_state:
-    def __init__(self, config: dict, output_type: str):
+    def __init__(self, config: dict[Any, Any], output_type: str):
         self.num_hubs: int = config['total_hubs']
-        self.hubs: dict = config['hubs']
+        self.hubs: dict[Any, Any] = config['hubs']
         self.goal_name: str = config['goal_name']
-        self.connections: list = config['connections']
-        self.drones: list = [f'D{drone.id}' for drone in config['drones']]
+        self.connections: list[Any] = config['connections']
+        self.drones: list[Any] = [f'D{drone.id}' for drone in config['drones']]
         self.current_turn: int = 0
         self.total_cost: int = 0
         self.output_type: str = output_type
         self.init_check: bool = False
-        self.turn_saver: list = []
+        self.turn_saver: list[Any] = []
         if self.output_type == 'pygame' or self.output_type == 'both':
             self.display = pygame.display.set_mode((1800, 1000))
             self.copy_display = self.display
-        self.current_state: dict = self.setup_state()
-        self.graph: dict = {}
+        self.current_state: dict[Any, Any] = self.setup_state()
+        self.graph: dict[Any, Any] = {}
 
     # pygame setup
     def sim_init(self) -> None:
@@ -35,6 +36,7 @@ class sim_state:
         if self.num_hubs > 35:
             self.display = pygame.display.set_mode((1800, 600))
 
+        # creating the hub visuals
         for i in self.graph:
             for j in self.graph[i]:
                 x: float = i
@@ -80,6 +82,7 @@ class sim_state:
                                      0)
                 self.display.blit(text, text_rect)
 
+        # creating the connections visuals
         link_color = pygame.Color('snow3')
         size_adjust: int = 0
         if self.num_hubs > 35:
@@ -176,11 +179,14 @@ class sim_state:
         self.copy_display = self.display.copy()
 
     def sim_updater(self) -> None:
+        # resetting the screen to be the copy to remove the old drones
         self.display.blit(self.copy_display, (0, 0))
         pygame.display.update()
         font = pygame.font.Font(None, 15)
         drone_color = pygame.Color('springgreen')
-        offset: dict = {}
+        offset: dict[Any, Any] = {}
+
+        # searching for drones that might be on connections
         for key in self.current_state:
             if key == 'turn':
                 continue
@@ -226,6 +232,8 @@ class sim_state:
                     pygame.draw.circle(self.display, (drone_color),
                                        [mid_x * 180 + 50, mid_y * 180 + 50],
                                        3.14)
+
+            # creating the drones that are on hubs
             for hub in self.hubs:
                 if self.current_state[key] == hub.name:
                     try:
@@ -260,9 +268,9 @@ class sim_state:
                                            3.14)
         pygame.display.flip()
 
-    def setup_state(self) -> dict:
-        setup_dict: dict = {'turn': self.current_turn}
-        init_turn: dict = {}
+    def setup_state(self) -> dict[Any, Any]:
+        setup_dict: dict[Any, Any] = {'turn': self.current_turn}
+        init_turn: dict[Any, Any] = {}
 
         for drone in self.drones:
             setup_dict[drone] = 'start'
@@ -280,7 +288,7 @@ class sim_state:
 
         return setup_dict
 
-    def update_state(self, turn_result: dict) -> None:
+    def update_state(self, turn_result: dict[Any, Any]) -> None:
         self.current_turn += 1
         self.current_state['turn'] = self.current_turn
 
@@ -295,10 +303,26 @@ class sim_state:
 
     def produce_end(self) -> None:
         num_drones: int = len(self.drones)
+        wait_close: bool = False
 
+        # print out all the turns to the terminal after pygame is finished
         if self.output_type == 'pygame':
             for turn in self.turn_saver:
                 rprint(turn)
+
+        # allow the user to end pygame/close window gracefully
+        if self.output_type == 'pygame' or self.output_type == 'both':
+            wait_close = True
+        while wait_close is True:
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    wait_close = False
+                if event.type == pygame.KEYDOWN:
+                    key = event.key
+                    if key == pygame.K_ESCAPE or key == pygame.K_SPACE:
+                        wait_close = False
+
+        # print statistics
         print('-' * 16)
         print(f"Turns to complete full sim: {self.current_turn}")
         print("Average number of drones moved per turn:",
@@ -308,9 +332,9 @@ class sim_state:
         print(f"Sum of turns taken by drones: {self.total_cost}")
 
 
-def create_graph(hubs: dict) -> dict:
-    row_track: dict = {}
-    graph_track: dict = {}
+def create_graph(hubs: dict[Any, Any]) -> dict[Any, Any]:
+    row_track: dict[Any, Any] = {}
+    graph_track: dict[Any, Any] = {}
     min_x: int = 1
     min_y: int = 1
 
@@ -352,7 +376,8 @@ def create_graph(hubs: dict) -> dict:
     return graph_track
 
 
-def turn_print(turn_result: dict, out_type: str, hubs: dict) -> str:
+def turn_print(turn_result: dict[Any, Any], out_type: str,
+               hubs: dict[Any, Any]) -> str:
     num_moves: int = len(turn_result)
     turn_str: str = ''
     colour: str = ''

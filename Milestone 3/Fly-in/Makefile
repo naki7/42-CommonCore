@@ -22,7 +22,7 @@ debug:
 	$(PYTHON) -m pdb $(MAIN) $(FILE) $(OUTPUT)
 
 clean:
-	rm -rf $(VENV) build dist *.egg-info .mypy_cache
+	rm -rf $(VENV) build dist *.egg-info .mypy_cache maps
 	find . -type d -name "__pycache__" -exec rm -rf {} +
 
 lint:

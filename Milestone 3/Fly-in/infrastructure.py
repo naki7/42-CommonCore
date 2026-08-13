@@ -1,4 +1,5 @@
 from parser import HubStruct
+from typing import Any
 
 
 class Drone:
@@ -7,27 +8,27 @@ class Drone:
         self.location: HubStruct = start
         self.next_hub: HubStruct | None = None
         self.status: str = 'searching'
-        self.current_path: list = [self.location]
+        self.current_path: list[Any] = [self.location]
         self.path_len: int = 1
 
 
 class Hub:
-    def __init__(self, config: HubStruct, connections: list):
+    def __init__(self, config: HubStruct, connections: list[Any]):
         self.name: str = config.name
         self.x: int = config.x
         self.y: int = config.y
         self.type: str | None = config.zone
         self.color: str | None = config.color
         self.capacity: int | None = config.max_drones
-        self.connections: list = []
-        self.connect_names: list = self.get_links(connections)
-        self.linked_hubs: list = []
+        self.connections: list[Any] = []
+        self.connect_names: list[Any] = self.get_links(connections)
+        self.linked_hubs: list[Any] = []
         self.current_usage: int = 0
-        self.occupants: list = []
+        self.occupants: list[Any] = []
         # self.checked: bool = False
 
-    def get_links(self, connections: list) -> list:
-        links_list: list = []
+    def get_links(self, connections: list[Any]) -> list[Any]:
+        links_list: list[Any] = []
         for link in connections:
             if link.hubs[0] == self.name:
                 links_list.append(link.hubs[1])
@@ -37,7 +38,7 @@ class Hub:
                 self.connections.append(link)
         return links_list
 
-    def link_hubs(self, hubs: list) -> None:
+    def link_hubs(self, hubs: list[Any]) -> None:
         for name in self.connect_names:
             for hub in hubs:
                 if hub.name == name:
@@ -65,15 +66,15 @@ class Hub:
 
 
 class Connection:
-    def __init__(self, index: int, config: list):
+    def __init__(self, index: int, config: list[Any]):
         self.id: int = index
-        self.hubs: tuple = (config[0], config[1])
+        self.hubs: tuple[Any, Any] = (config[0], config[1])
         self.name: str = f'{config[0]}-{config[1]}'
-        self.linked_hubs: list = []
+        self.linked_hubs: list[Any] = []
         self.init_hub: HubStruct | None = None
         self.capacity: int = config[2]
         self.current_usage: int = 0
-        self.occupants: list = []
+        self.occupants: list[Any] = []
 
     def add_drone(self, drone: Drone) -> bool:
         if self.current_usage < self.capacity:
@@ -91,7 +92,7 @@ class Connection:
         else:
             return False
 
-    def find_hubs(self, hubs: list) -> None:
+    def find_hubs(self, hubs: list[Any]) -> None:
         for hub in hubs:
             if self.init_hub is None and hub.name == self.hubs[0]:
                 self.init_hub = hub
@@ -99,11 +100,11 @@ class Connection:
                 self.linked_hubs.append(hub)
 
 
-def base_structure(config: dict) -> dict:
-    hubs: list = []
+def base_structure(config: dict[Any, Any]) -> dict[Any, Any]:
+    hubs: list[Any] = []
     total_hubs: int = 0
-    connections: list = []
-    drones: list = []
+    connections: list[Any] = []
+    drones: list[Any] = []
 
     for key in config['connections']:
         connections.append(Connection(key, config['connections'][key]))

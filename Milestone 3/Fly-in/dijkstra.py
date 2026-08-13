@@ -1,9 +1,10 @@
 from infrastructure import Hub
+from typing import Any
 import heapq
 import itertools
 
 
-def dijkstra(current: list, path_len: int, goal_name: str) -> list:
+def dijkstra(current: list[Any], path_len: int, goal_name: str) -> list[Any]:
     start_hub: Hub = current[path_len - 1]
     from fly_in import get_connect
 
@@ -37,10 +38,10 @@ def dijkstra(current: list, path_len: int, goal_name: str) -> list:
         else:
             return False
 
-    queue: list = []
+    queue: list[Any] = []
     counter = itertools.count()
     heapq.heappush(queue, (0, 0, next(counter), [start_hub]))
-    best_scores: dict = {start_hub.name: (0, 0)}
+    best_scores: dict[Any, Any] = {start_hub.name: (0, 0)}
 
     while queue:
         cost, neg_priority, _, path = heapq.heappop(queue)
