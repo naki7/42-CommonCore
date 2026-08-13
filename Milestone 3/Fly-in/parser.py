@@ -220,11 +220,15 @@ def connection_handler(config_arr: list, hub_names: list) -> dict:
         for link in connect_dict:
             if connect_dict[link][0] == connection[0]:
                 if connect_dict[link][1] == connection[1]:
-                    if connection[2] < 1:
+                    try:
+                        if int(connection[2]) < 1:
+                            raise ValueError(
+                                f'{connection[0]}-{connection[1]}')
+                        else:
+                            connect_dict[link].append(connection[2])
+                    except ValueError:
                         print('invalid max_link_capacity used')
-                        raise ValueError(f'max_link_capacity={connection[2]}')
-                    else:
-                        connect_dict[link].append(connection[2])
+                        raise ValueError(f'{connection[0]}-{connection[1]}')
     # add the default to connections without a specified criteria
     for connection in connect_dict:
         if len(connect_dict[connection]) != 3:
@@ -243,6 +247,15 @@ def parser(origin_arr: list) -> dict:
     # remove comments and blank lines
     config_arr = [line for line in origin_arr if line.startswith('#') is False
                   and line != '']
+
+    for line in config_arr:
+        if line.startswith('nb_drones', 0, 9) is False:
+            if line.startswith('start_hub', 0, 9) is False:
+                if line.startswith('end_hub', 0, 7) is False:
+                    if line.startswith('hub', 0, 3) is False:
+                        if line.startswith('connection', 0, 10) is False:
+                            print("Invalid line in file")
+                            raise ValueError(f'{line}')
 
     # parses the number of drones
     if config_arr[0].startswith('nb_drones:') is False:
