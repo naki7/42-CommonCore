@@ -259,7 +259,7 @@ def parser(origin_arr: list) -> dict:
     # parses the connections
     hub_names = [hub_dict[key].name for key in hub_dict if key != 'nb_drones']
     connections_dict = connection_handler(config_arr, hub_names)
-    # instead of printing add to main dict
+
     config_dict['connections'] = {}
     for key in connections_dict:
         config_dict['connections'][key] = connections_dict[key]

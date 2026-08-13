@@ -169,13 +169,26 @@ The initial implementation of the program took an A* inspired approach, which
     could easily get stuck in dead ends as they would move into space to make
     space for other drones without considering the final result of such a move.
 
+_Worst-case performance O(V) = O($b^d$) - (where V is the number of nodes,_
+    _b is the branching factor (max number of neighbors per current node), and_
+    _d is the depth of the shortest solution)_
+
 To solve the issue of large maps, I implemented a Dijkstra algorithm to solve
     the further paths that lead to the goal. The difference with this (since A*
     is based on Dijkstra) is that the algorithm tries to look for the actual
     end of the maze before starting to walk. This means that it is a lot more
     likely to find the goal and the hubs to take to get there. However, as it
     does all the cost checks in one step, it then lacks the flexibility that
-    A* has as it will try moving all drones through the same "cheapest" path.
+    A* has as it will try moving all drones through the same "cheapest" path
+    where ever it possibly can.
+
+_Worst-case performance O(E + VlogV) - (where E is the number of edges/_
+    _connections between nodes)_
+
+_Note that in both cases of performance of the algorithms, the actual math is_
+    _massively complicated by the fact that the drones moving and capacities_
+    _of the hubs changing cause both performance to fluctuate throughout_
+    _simulations_
 
 ### Visual Representation Features
 
