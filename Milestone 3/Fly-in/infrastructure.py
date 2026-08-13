@@ -25,7 +25,6 @@ class Hub:
         self.linked_hubs: list[Any] = []
         self.current_usage: int = 0
         self.occupants: list[Any] = []
-        # self.checked: bool = False
 
     def get_links(self, connections: list[Any]) -> list[Any]:
         links_list: list[Any] = []

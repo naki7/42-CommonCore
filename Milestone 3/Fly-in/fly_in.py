@@ -55,8 +55,12 @@ def path_finder(drones: list[Any], state: sim_state) -> None:
                 temp_len: int = len(temp) + prev_len
 
                 # cleans out the second hub so turns print one at a time
+                SOLVE THIS SHIT THANKS FUTURE ME ALSO LOVE YOU uWu
                 if temp_len - prev_len == 2:
-                    temp.pop(1)
+                    if state.current_turn == 0 and temp[0].name != 'start':
+                        temp.pop(0)
+                    else:
+                        temp.pop(1)
                     temp_len -= 1
 
                 # goes through the previous hubs visited by the drone to clear
