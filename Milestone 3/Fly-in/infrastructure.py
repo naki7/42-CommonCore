@@ -1,5 +1,6 @@
 from parser import HubStruct
 from typing import Any
+from validate_ending import validate_ending
 
 
 class Drone:
@@ -124,6 +125,13 @@ def base_structure(config: dict[Any, Any]) -> dict[Any, Any]:
     for i in range(0, config['nb_drones']):
         drones.append(Drone(i + 1, hubs[0]))
         hubs[0].add_drone(drones[i])
+
+    end_check: bool = validate_ending(hubs[0], hubs[-1].name)
+
+    if end_check is False:
+        print('Error: No hubs and connections complete a path between the',
+              'start and end hub')
+        quit()
 
     return {
         'drones': drones,

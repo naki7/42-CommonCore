@@ -44,10 +44,10 @@ def path_finder(drones: list[Any], state: sim_state) -> None:
                 if drone.next_hub is None:
                     if state.num_hubs > 10:
                         temp: list[Any] = dijkstra(drone.current_path,
-                                                   drone.path_len,
+                                                   prev_len,
                                                    state.goal_name)
                     else:
-                        temp = astar(drone.current_path, drone.path_len,
+                        temp = astar(drone.current_path, prev_len,
                                      state.goal_name)
 
                 else:
@@ -55,14 +55,16 @@ def path_finder(drones: list[Any], state: sim_state) -> None:
                 temp_len: int = len(temp) + prev_len
 
                 # cleans out the second hub so turns print one at a time
-                SOLVE THIS SHIT THANKS FUTURE ME ALSO LOVE YOU uWu
                 if temp_len - prev_len == 2:
-                    if state.current_turn == 0 and temp[0].name != 'start':
+                    connect_check: False = False
+                    for link in temp[1].connect_names:
+                        if link == drone.current_path[prev_len - 1].name:
+                            connect_check = True
+                    if connect_check is True:
                         temp.pop(0)
                     else:
                         temp.pop(1)
                     temp_len -= 1
-
                 # goes through the previous hubs visited by the drone to clear
                 # the space and make capacity available and also appends the
                 # next hub it moves to in current turn
@@ -88,14 +90,32 @@ def path_finder(drones: list[Any], state: sim_state) -> None:
                                         drone.current_path[prev_i],
                                         drone.next_hub
                                     )
-                                    connection.add_drone(drone)
-                                    drone.current_path.append(connection)
+                                    link_test = connection.add_drone(drone)
+                                    if link_test is True:
+                                        drone.current_path.append(connection)
+                                        local_name: str = drone.current_path[i].name
+                                        turn_result[f'D{drone.id}'] = local_name
+                                        temp_len = len(drone.current_path)
+                                        break
+                                    else:
+                                        drone.next_hub = None
+                                        temp_len -= 1
+                                        continue
                                 else:
+                                    # if drone.id == 1:
+                                    #     print(drone.next_hub.name)
                                     drone.current_path.append(drone.next_hub)
                                     drone.next_hub.add_drone(drone)
                                     drone.next_hub = None
-                            local_name: str = drone.current_path[i].name
-                            turn_result[f'D{drone.id}'] = local_name
+                            if i <= len(drone.current_path) - 1:
+                                # if drone.id == 1 and i == 4:
+                                #     print(drone.current_path[i].name)
+                                #     print(len(drone.current_path))
+                                #     print(i)
+                                local_name: str = drone.current_path[i].name
+                                # if drone.id == 1:
+                                #     print(local_name)
+                                turn_result[f'D{drone.id}'] = local_name
                 drone.path_len = temp_len
                 if state.output_type == 'pygame':
                     if state.num_hubs < 15:
