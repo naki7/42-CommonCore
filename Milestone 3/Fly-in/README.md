@@ -259,10 +259,16 @@ In the above template the text in between <> can be replaced with the required
     display, and lastly, if 'both' is used, it will then run both the terminal
     output and the graphical display.
 
+#### Pygame
+
 While running pygame, you can press 'esc' key or the close terminal UI button
     and the pygame will close. The program will continue running and produce
     terminal output instead. You can force close the terminal output/program
     early like normal using 'Ctrl+c' on the terminal.
+
+Once the program has finished moving all drones, Pygame will remain open. You
+    can close the program using the same commands as above or you can press
+    'space' to close the program.
 
 ### Example Input and Expected Output
 
