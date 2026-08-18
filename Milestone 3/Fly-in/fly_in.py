@@ -1,4 +1,5 @@
 from infrastructure import base_structure, Hub, Connection
+from validate_ending import loop_closer
 from typing import Any
 from parser import parser_main
 from output import sim_state
@@ -21,6 +22,9 @@ def get_connect(current: Hub, next: Hub) -> Any:
 
 def path_finder(drones: list[Any], state: sim_state) -> None:
     searching_drones: int = len(drones)
+
+    # Goes through all hubs and blocks off definite loops that can be dead-ends
+    loop_closer(state)
 
     while searching_drones > 0:
         turn_result: dict[Any, Any] = {}
@@ -93,8 +97,9 @@ def path_finder(drones: list[Any], state: sim_state) -> None:
                                     link_test = connection.add_drone(drone)
                                     if link_test is True:
                                         drone.current_path.append(connection)
-                                        local_name: str = drone.current_path[i].name
-                                        turn_result[f'D{drone.id}'] = local_name
+                                        link_name: str = drone.current_path[
+                                            i].name
+                                        turn_result[f'D{drone.id}'] = link_name
                                         temp_len = len(drone.current_path)
                                         break
                                     else:
