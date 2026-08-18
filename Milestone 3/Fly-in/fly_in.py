@@ -60,7 +60,7 @@ def path_finder(drones: list[Any], state: sim_state) -> None:
 
                 # cleans out the second hub so turns print one at a time
                 if temp_len - prev_len == 2:
-                    connect_check: False = False
+                    connect_check: bool = False
                     for link in temp[1].connect_names:
                         if link == drone.current_path[prev_len - 1].name:
                             connect_check = True

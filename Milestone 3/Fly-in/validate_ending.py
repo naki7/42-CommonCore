@@ -2,9 +2,9 @@ from typing import Any
 
 
 def loop_closer(state: Any) -> None:
-    exclude: list = [state.hubs[0].name]
-    double_chain: list = []
-    block: list = []
+    exclude: list[Any] = [state.hubs[0].name]
+    double_chain: list[Any] = []
+    block: list[Any] = []
 
     for link in state.hubs[0].linked_hubs:
         exclude.append(link.name)
