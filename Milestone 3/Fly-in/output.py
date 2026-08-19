@@ -7,7 +7,7 @@ import time
 from typing import Any
 
 
-class sim_state:
+class SimState:
     def __init__(self, config: dict[Any, Any], output_type: str):
         self.num_hubs: int = config['total_hubs']
         self.hubs: dict[Any, Any] = config['hubs']

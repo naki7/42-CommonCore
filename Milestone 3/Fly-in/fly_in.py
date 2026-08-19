@@ -2,7 +2,7 @@ from infrastructure import base_structure, Hub, Connection
 from validate_ending import loop_closer
 from typing import Any
 from parser import parser_main
-from output import sim_state
+from output import SimState
 from dijkstra import dijkstra
 from astar import astar
 import pygame
@@ -20,7 +20,7 @@ def get_connect(current: Hub, next: Hub) -> Any:
     return None
 
 
-def path_finder(drones: list[Any], state: sim_state) -> None:
+def path_finder(drones: list[Any], state: SimState) -> None:
     searching_drones: int = len(drones)
 
     # Goes through all hubs and blocks off definite loops that can be dead-ends
@@ -107,19 +107,11 @@ def path_finder(drones: list[Any], state: sim_state) -> None:
                                         temp_len -= 1
                                         continue
                                 else:
-                                    # if drone.id == 1:
-                                    #     print(drone.next_hub.name)
                                     drone.current_path.append(drone.next_hub)
                                     drone.next_hub.add_drone(drone)
                                     drone.next_hub = None
                             if i <= len(drone.current_path) - 1:
-                                # if drone.id == 1 and i == 4:
-                                #     print(drone.current_path[i].name)
-                                #     print(len(drone.current_path))
-                                #     print(i)
                                 local_name: str = drone.current_path[i].name
-                                # if drone.id == 1:
-                                #     print(local_name)
                                 turn_result[f'D{drone.id}'] = local_name
                 drone.path_len = temp_len
                 if state.output_type == 'pygame':
@@ -187,7 +179,7 @@ def main() -> None:
 
     sim_config: dict[Any, Any] = base_structure(parser_main(sys.argv[1]))
 
-    state_saver: sim_state = sim_state(sim_config, output_type)
+    state_saver: SimState = SimState(sim_config, output_type)
     path_finder(sim_config['drones'], state_saver)
 
 

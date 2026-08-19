@@ -110,6 +110,9 @@ def astar(current: list[Any], path_len: int, goal_name: str) -> list[Any]:
         path_attempt: dict[Any, Any] = {'cost': -1, 'hubs': [], 'priority': 0}
         second_hub: dict[Any, Any] = {'cost': -1, 'hub': None}
 
+        if first_link.type == 'blocked':
+            continue
+
         if first_link.name == goal_name:
             best_path = {'cost': 1, 'hubs': [first_link]}
             break
@@ -127,7 +130,10 @@ def astar(current: list[Any], path_len: int, goal_name: str) -> list[Any]:
             if chase_check is True:
                 if first_link.current_usage < first_link.capacity:
                     best_path['cost'] = 0
-                    best_path['priority'] = 1
+                    if first_link.type == 'priority':
+                        best_path['priority'] = 1
+                    else:
+                        best_path['priority'] = 2
                     best_path['hubs'].append(first_link)
                     best_path['hubs'].append(first_link.linked_hubs[0])
                     break
@@ -141,9 +147,7 @@ def astar(current: list[Any], path_len: int, goal_name: str) -> list[Any]:
             if first_link.current_usage >= first_link.capacity:
                 continue
 
-        if first_link.type == 'blocked':
-            continue
-        elif first_link.type == 'restricted':
+        if first_link.type == 'restricted':
             link_check = get_connect(current[path_len - 1], first_link)
             if link_check is not None:
                 if link_check.current_usage >= link_check.capacity:
@@ -156,19 +160,19 @@ def astar(current: list[Any], path_len: int, goal_name: str) -> list[Any]:
         path_attempt['hubs'].append(first_link)
 
         for second_link in first_link.linked_hubs:
+            if second_link.type == 'blocked':
+                continue
+            elif second_link.type == 'restricted':
+                continue
+
             if second_link.name == goal_name:
                 second_hub['cost'] = -1
                 path_attempt['hubs'].append(second_link)
-                path_attempt['priority'] = 1
+                path_attempt['priority'] = 2
                 break
 
             name_check = hub_checker(current, second_link)
             if name_check is True:
-                continue
-
-            if second_link.type == 'blocked':
-                continue
-            elif second_link.type == 'restricted':
                 continue
 
             # avoid stepping into an immediate dead-end branch
@@ -186,7 +190,7 @@ def astar(current: list[Any], path_len: int, goal_name: str) -> list[Any]:
                 if chase_check is True:
                     if second_link.current_usage < second_link.capacity:
                         best_path['cost'] = 0
-                        best_path['priority'] = 1
+                        best_path['priority'] = 2
                         best_path['hubs'].append(second_link)
                         best_path['hubs'].append(second_link.linked_hubs[0])
                         break
