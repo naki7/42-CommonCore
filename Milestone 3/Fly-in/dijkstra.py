@@ -17,7 +17,10 @@ def dijkstra(current: list[Any], path_len: int, goal_name: str) -> list[Any]:
         return 1
 
     def hub_priority(hub: Hub) -> int:
-        return 1 if hub.type == 'priority' else 0
+        if hub.type == 'priority':
+            return 1
+        else:
+            return 0
 
     def is_accessible(hub: Hub) -> bool:
         if hub.type == 'blocked':
