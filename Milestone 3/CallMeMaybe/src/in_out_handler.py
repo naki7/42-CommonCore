@@ -28,9 +28,17 @@ def obj_to_json(object: dict[Any, Any]) -> None:
     try:
         with open(out_name, 'x') as file:
             file.write(json.dumps(object))
+            print('function_calling_results.json successfully written.')
     except FileExistsError:
-        print('function_calling_results_.json already exists. Switching to',
-              'function_calling_results_backup.json.\nPlease note, there are',
-              'no further backup files.\nPlease Move or Delete current files.')
-        with open(backup_name, 'x') as file:
-            file.write(json.dumps(object))
+        try:
+            with open(backup_name, 'x') as file:
+                file.write(json.dumps(object))
+            print('function_calling_results_.json already exists. Switching',
+                  'to function_calling_results_backup.json.\nPlease note,',
+                  'there are no further backup files.\nPlease Move or Delete,',
+                  'current files')
+        except FileExistsError:
+            print('Both the function_calling_results.json file and the',
+                  'function_calling_results_backup.json file have already',
+                  'been created and used.\nPlease Move or Delete these files',
+                  'before running the program again.')
